@@ -1,5 +1,10 @@
 #include "..\include\p2collider.h"
 
+p2Collider::p2Collider()
+{
+	
+}
+
 p2Collider::p2Collider(p2ColliderDef colDef)
 {
 	colliderDefinition = colDef;

@@ -40,7 +40,7 @@ TEST(Physics, TestVector)
             { "name", "Test Vector" }
     };
     json systemJson = {
-            {"script_path", "scripts/vector_system.py"}
+			{"script_path", "scripts/vector_rotation_test.py"}
     };
     sceneJson["systems"] = json::array({ systemJson });
     auto* sceneManager = engine.GetSceneManager();

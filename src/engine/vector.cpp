@@ -124,4 +124,9 @@ Vec2f Vec2f::Rotate(float angle) const
     return Vec2f(cosf(radianAngle)*x-sinf(radianAngle)*y,
             sinf(radianAngle)*x+cosf(radianAngle)*y);
 }
+
+Vec2f Vec2f::GetNormal() const
+{
+	return { y, x };
+}
 }

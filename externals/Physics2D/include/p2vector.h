@@ -27,9 +27,6 @@ SOFTWARE.
 
 struct p2Vec3;
 
-/**
-* \brief Vector class
-*/
 struct p2Vec2
 {
 
@@ -45,36 +42,23 @@ struct p2Vec2
 	p2Vec2& operator-=(const p2Vec2& v);
 	p2Vec2& operator*=(float f);
 	p2Vec2 operator /(float f) const;
-	p2Vec2 operator *(float f) const;
-	/**
-	* \brief Dot product of two vectors
-	*/
+	p2Vec2 operator*(float f) const;
+	p2Vec2 operator *(const p2Vec2& v) const;
+
 	static float Dot(p2Vec2 v1, p2Vec2 v2);
-	/**
-	* \brief Cross product of two vectors
-	*/
 	static float Cross(p2Vec2 v1, p2Vec2 v2);
-	/**
-	* \brief Calculate the magnitude of the p2Vec2
-	*/
 	float GetMagnitude() const;
-	/**
-	* \brief Calculate a normalized version of the p2Vec2
-	*/
-	p2Vec2 Normalized();
-	/**
-	* \brief Normalize the p2Vec2
-	*/
+	p2Vec2 Normalized() const;
 	void NormalizeSelf();
 
 	p2Vec2 Rotate(float angle) const;
 	static p2Vec2 Lerp(const p2Vec2& v1, const p2Vec2& v2, float t);
 	static float AngleBetween(const p2Vec2& v1, const p2Vec2& v2);
+	void ProjectOn(const p2Vec2 & v1);
+	p2Vec2 GetNormal() const;
+	p2Vec2 GetReflection(const p2Vec2& n) const;
 
-	/**
-	* \brief 
-	*/
-	p2Vec3 to3();
+	p2Vec3 to3() const;
 
 	float x = 0.0f;
 	float y = 0.0f;

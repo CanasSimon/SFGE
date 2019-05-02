@@ -12,7 +12,7 @@ class VectorSystem(System):
 
     def init(self):
         self.t = 0.0
-        self.rotation_speed = 45.0
+        self.rotation_speed = 0.0
 
     def update(self, dt):
         self.t += dt

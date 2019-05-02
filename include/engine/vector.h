@@ -36,13 +36,14 @@ class Vec2f
   float x;
   float y;
 
-  Vec2f(float x, float y);
+	Vec2f(float x, float y);
   Vec2f();
 #ifdef SFML_VECTOR2_HPP
   Vec2f( const sf::Vector2f& v);//copy construct
 #endif
   float GetMagnitude();
   Vec2f Normalized();
+  Vec2f GetNormal() const;
   Vec2f Rotate(float angle) const;
   static Vec2f Lerp(const Vec2f& v1, const Vec2f& v2, float t);
   static float AngleBetween(const Vec2f& v1, const Vec2f& v2);

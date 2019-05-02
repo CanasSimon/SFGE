@@ -11,6 +11,7 @@ class Color:
     Cyan = 0
     Transparent = 0
 
+
 class Vector2f:
     """SFML and default SFGE Vector type when not working on the physic"""
     def __init__(self):
@@ -37,6 +38,9 @@ class Vec2f:
     def lerp(v1, v2, t):
         pass
 
+    @staticmethod
+    def rotate(angle):
+        pass
 
 
 class Vector2i:
@@ -77,6 +81,15 @@ class p2Vec2:
         pass
 
     def normalized_self(self):
+        pass
+
+    def project_on(self, v1):
+        pass
+
+    def get_normal(self):
+        pass
+
+    def get_reflection(self, n):
         pass
 
 
@@ -122,9 +135,11 @@ class Sprite:
     def load_texture(self, texture_name: str):
         pass
 
+
 class Shape:
     def set_fill_color(self, color: Color):
         pass
+
 
 class Timer:
     """Timer used for update loop and """
@@ -159,6 +174,7 @@ class ColliderData:
         self.collider = Collider()
         self.entity = 0
 
+
 class System:
     def init(self):
         pass
@@ -178,7 +194,8 @@ class System:
     def on_draw(self):
         pass
 
-class ComponentManager():
+
+class ComponentManager:
     def add_component(self, entity):
         pass
 
@@ -188,14 +205,19 @@ class ComponentManager():
     def get_component(self, entity):
         pass
 
+
 class SpriteManager(System):
     def add_component(self, entity):
         return Sprite()
+
     def get_component(self, entity:int):
         pass
+
+
 class ShapeManager(System):
     def get_component(self, entity:int):
         pass
+
 
 class TextureManager(System):
     pass    
@@ -212,6 +234,7 @@ class Graphics2dManager(System):
 
     def draw_vector(self, v:Vec2f, origin_pos:Vec2f, color:Color):
         pass
+
 
 class SceneManager(System):
     def load_scene(self, scene_name):
@@ -254,6 +277,7 @@ class Configuration:
     def __init__(self):
         self.screen_size = Vec2f()
 
+
 class Engine:
     def __init__(self):
         self.config = Configuration()
@@ -291,8 +315,10 @@ class Body2d:
     def apply_force(self, force:p2Vec2):
         pass
 
+
 class Collider:
     pass
+
 
 class KeyboardManager:
     class Key:
@@ -301,6 +327,7 @@ class KeyboardManager:
         Down = 0
         Left = 0
         Right = 0
+
     def is_key_held(self, key):
         pass
 
@@ -310,6 +337,7 @@ class KeyboardManager:
     def is_key_up(self, key):
         pass
 
+
 class MouseManager:
     def __init__(self):
         self.position = Vec2f()
@@ -318,6 +346,7 @@ class MouseManager:
 class InputManager:
     keyboard = KeyboardManager()
     mouse = MouseManager()
+
 
 engine = Engine()
 input_manager = InputManager()

@@ -44,7 +44,7 @@ TEST(Physics, TestBallFallingToGround)
 
 	json transformJson1;
 	transformJson1["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson1["position"] = { 300,300 };
+	transformJson1["position"] = { 600,300 };
 	transformJson1["scale"] = { 1.0,1.0 };
 	transformJson1["angle"] = 0.0;
 
@@ -74,7 +74,7 @@ TEST(Physics, TestBallFallingToGround)
 
 	json transformJson2;
 	transformJson2["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson2["position"] = { 400,600 };
+	transformJson2["position"] = { 600,600 };
 	transformJson2["scale"] = { 1.0,1.0 };
 	transformJson2["angle"] = 0.0;
 
