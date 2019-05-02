@@ -36,9 +36,8 @@ void p2World::Step(float dt)
 	{
 		if(body.GetType() == p2BodyType::DYNAMIC)
 		{
-			body.SetLinearVelocity(body.GetLinearVelocity());
 			body.ApplyForceToCenter(m_Gravity * dt);
-			body.Offset(body.GetLinearVelocity());
+			body.Offset(body.GetLinearVelocity() * dt);
 		}
 	}
 

@@ -216,6 +216,7 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		auto* transform = m_Transform2dManager->GetComponentPtr(entity);
 		const auto pos = transform->Position + offset;
 		bodyDef.position = pixel2meter(pos);
+		bodyDef.mass = 1;
 		
 		auto* body = world->CreateBody(&bodyDef);
 		body->SetLinearVelocity(pixel2meter(velocity));
