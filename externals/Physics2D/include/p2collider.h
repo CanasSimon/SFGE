@@ -29,6 +29,14 @@ SOFTWARE.
 #include <p2shape.h>
 #include "engine/entity.h"
 
+enum class p2ColliderType
+{
+	NONE,
+	CIRCLE,
+	RECT,
+	POLY
+};
+
 /**
 * \brief Struct defining a p2Collider when creating one
 */
@@ -38,6 +46,7 @@ struct p2ColliderDef
 	p2Shape* shape;
 	float restitution;
 	bool isSensor = false;
+	p2ColliderType* m_ColliderType;
 };
 
 /**
@@ -47,21 +56,19 @@ struct p2ColliderDef
 class p2Collider
 {
 public:
-	p2Collider(p2ColliderDef colDef);
 	p2Collider();
-	/**
-	* \brief Check if the p2Collider is a sensor
-	*/
+	p2Collider(p2ColliderDef colDef);
 	bool IsSensor() const;
-	/**
-	* \brief Return the userData
-	*/
 	void* GetUserData() const;
 	p2Shape* GetShape() const;
 	void SetUserData(void* colliderData);
+	p2Vec2 GetHalfExtend() const;
 private:
 	void* userData = nullptr;
+	p2Shape* m_Shape;
+	p2ColliderType m_ColliderType;
 	p2ColliderDef colliderDefinition;
+	p2Vec2 halfExtend;
 };
 
 

@@ -34,3 +34,11 @@ class ContactDebugSystem(System):
         else:
             self.contact_count[self.entities.index(c1.entity)] -= 1
             self.contact_count[self.entities.index(c2.entity)] -= 1
+
+    def on_draw(self):
+        for entity in self.entities:
+            transform = transform2d_manager.get_component(entity)
+            body: Body2d = physics2d_manager.body2d_manager.get_component(entity)
+
+            position = transform.position
+            graphics2d_manager.draw_vector(Vec2f(10, -10), position, Color.Green)

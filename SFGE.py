@@ -312,7 +312,7 @@ class Body2d:
         self.velocity = p2Vec2()
         self.magnitude = 0.0
 
-    def apply_force(self, force:p2Vec2):
+    def apply_force(self, force: p2Vec2):
         pass
 
 

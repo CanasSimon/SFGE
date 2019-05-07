@@ -84,8 +84,8 @@ private:
 	p2Vec2 position;
 	p2Vec2 linearVelocity;
 	float angularVelocity;
-	float mass;
-	p2BodyType type;
+	float mass = 1;
+	p2BodyType type = p2BodyType::DYNAMIC;
 
 	int m_ColliderIndex = 0;
 	std::vector<p2Collider> m_Colliders;

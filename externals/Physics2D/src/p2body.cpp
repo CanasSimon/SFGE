@@ -33,6 +33,10 @@ void p2Body::Init(p2BodyDef* bodyDef)
 
 	if (bodyDef->mass == 0) mass = 1;
 	else { mass = bodyDef->mass; }
+
+	const p2Vec2 halfExtend = m_Colliders[0].GetHalfExtend();
+	aabb.topRight = halfExtend;
+	aabb.bottomLeft = p2Vec2(-halfExtend.x, -halfExtend.y);
 }
 
 p2Vec2 p2Body::GetLinearVelocity() const

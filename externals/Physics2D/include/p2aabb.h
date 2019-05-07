@@ -35,13 +35,7 @@ struct p2AABB
 	p2Vec2 bottomLeft;
 	p2Vec2 topRight;
 
-	/**
-	* \brief Calculate the center and return it
-	*/
 	p2Vec2 GetCenter();
-	/**
-	* \brief Calculate the extends and return it
-	*/
 	p2Vec2 GetExtends() const;
 };
 #endif // !SFGE_P2AABB:H

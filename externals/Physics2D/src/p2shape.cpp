@@ -26,7 +26,7 @@ SOFTWARE.
 
 p2CircleShape::p2CircleShape(float radius) : p2Shape()
 {
-	type = ShapeType::CIRCLE;
+	type = CIRCLE;
 	m_Radius = radius;
 }
 
@@ -35,13 +35,42 @@ void p2CircleShape::SetRadius(float radius)
 	m_Radius = radius;
 }
 
-p2RectShape::p2RectShape(p2Vec2 size)
+float p2CircleShape::GetRadius() const
 {
-	type = ShapeType::RECT;
+	return m_Radius;
+}
+
+p2RectShape::p2RectShape() : p2Shape()
+{
+}
+
+p2RectShape::p2RectShape(p2Vec2 size) : p2Shape()
+{
+	type = RECT;
 	m_Size = size;
 }
 
 void p2RectShape::SetSize(p2Vec2 size)
 {
 	m_Size = size;
+}
+
+p2Vec2 p2RectShape::GetSize() const
+{
+	return m_Size;
+}
+
+p2PolygonShape::p2PolygonShape() : p2Shape()
+{
+}
+
+p2PolygonShape::p2PolygonShape(std::vector<p2Vec2> points) : p2Shape()
+{
+	type = POLY;
+	m_Points = points;
+}
+
+void p2PolygonShape::SetPoints(std::vector<p2Vec2> points)
+{
+	m_Points = points;
 }

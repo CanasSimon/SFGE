@@ -85,7 +85,7 @@ p2Body * Body2d::GetBody() const
 	return m_Body;
 }
 
-void editor::Body2dInfo::DrawOnInspector()
+	void editor::Body2dInfo::DrawOnInspector()
 {
 	const auto& body = bodyManager->GetComponentRef(m_Entity);
 	const auto* b2Body = body.GetBody();

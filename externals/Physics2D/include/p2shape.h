@@ -26,11 +26,15 @@ SOFTWARE.
 #define SFGE_P2SHAPE_H
 
 #include <p2vector.h>
+#include <stddef.h>
+#include <array>
+#include <vector>
 
 enum ShapeType
 {
 	CIRCLE,
-	RECT
+	RECT,
+	POLY
 };
 /**
 * \brief Abstract representation of a shape
@@ -48,29 +52,31 @@ class p2CircleShape : public p2Shape
 {
 public:
 	p2CircleShape(float radius = 1.0f);
-	/**
-	* \brief Setter for the radius
-	*/
 	void SetRadius(float radius);
+	float GetRadius() const;
 private:
-	float m_Radius;
+	float m_Radius{};
 };
 
-/** 
-* \brief Representation of a rectangle
-*/
 class p2RectShape : public p2Shape
 {
 public:
-	p2RectShape(p2Vec2 size = p2Vec2());
+	p2RectShape();
+	p2RectShape(p2Vec2 size);
 	void SetSize(p2Vec2 size);
+	p2Vec2 GetSize() const;
 private:
 	p2Vec2 m_Size;
 };
 
 class p2PolygonShape : public p2Shape
 {
-	
+public:
+	p2PolygonShape();
+	p2PolygonShape(std::vector<p2Vec2> points);
+	void SetPoints(std::vector<p2Vec2> points);
+private:
+	std::vector<p2Vec2> m_Points;
 };
 
 #endif
