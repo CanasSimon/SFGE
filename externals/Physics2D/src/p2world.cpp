@@ -38,6 +38,7 @@ void p2World::Step(float dt)
 		{
 			body.ApplyForceToCenter(m_Gravity * dt);
 			body.Offset(body.GetLinearVelocity() * dt);
+			body.RebuildAABB();
 		}
 	}
 

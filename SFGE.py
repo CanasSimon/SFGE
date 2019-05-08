@@ -311,8 +311,21 @@ class Body2d:
     def __init__(self):
         self.velocity = p2Vec2()
         self.magnitude = 0.0
+        self.p2body = Body()
 
     def apply_force(self, force: p2Vec2):
+        pass
+
+
+class Body:
+    def __init__(self):
+        self.velocity = p2Vec2()
+        self.magnitude = 0.0
+
+    def apply_force(self, force: p2Vec2):
+        pass
+
+    def get_aabb_extends(self):
         pass
 
 

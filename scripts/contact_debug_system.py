@@ -38,7 +38,8 @@ class ContactDebugSystem(System):
     def on_draw(self):
         for entity in self.entities:
             transform = transform2d_manager.get_component(entity)
-            body: Body2d = physics2d_manager.body2d_manager.get_component(entity)
+            body2d: Body2d = physics2d_manager.body2d_manager.get_component(entity)
 
             position = transform.position
-            graphics2d_manager.draw_vector(Vec2f(10, -10), position, Color.Green)
+            vector_pos = Physics2dManager.meter2pixel(body2d.p2body.get_aabb_extends())
+            graphics2d_manager.draw_vector(vector_pos, position, Color.Green)

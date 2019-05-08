@@ -34,9 +34,18 @@ void p2Body::Init(p2BodyDef* bodyDef)
 	if (bodyDef->mass == 0) mass = 1;
 	else { mass = bodyDef->mass; }
 
+	RebuildAABB();
+}
+
+void p2Body::RebuildAABB()
+{
+	if(m_Colliders.empty()) return;
+
 	const p2Vec2 halfExtend = m_Colliders[0].GetHalfExtend();
-	aabb.topRight = halfExtend;
-	aabb.bottomLeft = p2Vec2(-halfExtend.x, -halfExtend.y);
+	aabb.topRight = position + halfExtend;
+	aabb.bottomLeft = position - halfExtend;
+	aabb.topLeft = position + p2Vec2(-halfExtend.x, halfExtend.y);
+	aabb.bottomRight = position + p2Vec2(halfExtend.x, -halfExtend.y);
 }
 
 p2Vec2 p2Body::GetLinearVelocity() const
@@ -48,12 +57,12 @@ void p2Body::SetLinearVelocity(p2Vec2 velocity)
 {
 	linearVelocity = velocity;
 }
-float p2Body::GetAngularVelocity()
+float p2Body::GetAngularVelocity() const
 {
 	return angularVelocity;
 }
 
-p2Vec2 p2Body::GetPosition()
+p2Vec2 p2Body::GetPosition() const
 {
 	return position;
 }
@@ -88,4 +97,9 @@ p2BodyType p2Body::GetType() const
 float p2Body::GetMass() const
 {
 	return mass;
+}
+
+p2AABB p2Body::GetAABB() const
+{
+	return aabb;
 }

@@ -34,8 +34,14 @@ struct p2AABB
 {
 	p2Vec2 bottomLeft;
 	p2Vec2 topRight;
+	p2Vec2 bottomRight;
+	p2Vec2 topLeft;
 
-	p2Vec2 GetCenter();
+	p2Vec2 GetCenter() const;
 	p2Vec2 GetExtends() const;
+	p2Vec2 GetTopRight() const;
+	p2Vec2 GetBottomLeft() const;
+	p2Vec2 GetTopLeft() const;
+	p2Vec2 GetBottomRight() const;
 };
 #endif // !SFGE_P2AABB:H

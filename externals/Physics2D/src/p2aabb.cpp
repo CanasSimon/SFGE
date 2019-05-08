@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <p2aabb.h>
 
-p2Vec2 p2AABB::GetCenter()
+p2Vec2 p2AABB::GetCenter() const
 {
 	return (topRight - bottomLeft) / 2;
 }
@@ -32,4 +32,24 @@ p2Vec2 p2AABB::GetCenter()
 p2Vec2 p2AABB::GetExtends() const
 {
 	return {bottomLeft.x + topRight.x, bottomLeft.y + topRight.y};
+}
+
+p2Vec2 p2AABB::GetTopRight() const
+{
+	return topRight;
+}
+
+p2Vec2 p2AABB::GetBottomLeft() const
+{
+	return bottomLeft;
+}
+
+p2Vec2 p2AABB::GetTopLeft() const
+{
+	return topLeft;
+}
+
+p2Vec2 p2AABB::GetBottomRight() const
+{
+	return bottomRight;
 }

@@ -263,6 +263,7 @@ add_custom_command(TARGET SFGE_TEST POST_BUILD
 add_custom_command(TARGET SFGE_TEST POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
 		${CMAKE_SOURCE_DIR}/scripts ${CMAKE_BINARY_DIR}/scripts)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 
 #SFGE
 add_executable(SFGE src/main.cpp)

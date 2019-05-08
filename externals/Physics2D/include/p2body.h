@@ -61,13 +61,14 @@ class p2Body
 {
 public:
 	void Init(p2BodyDef* bodyDef);
+	void RebuildAABB();
 	p2Vec2 GetLinearVelocity() const;
 	
 	void SetLinearVelocity(p2Vec2 velocity);
 
-	float GetAngularVelocity();
+	float GetAngularVelocity() const;
 	
-	p2Vec2 GetPosition();
+	p2Vec2 GetPosition() const;
 	/**
 	* \brief Factory method creating a p2Collider
 	* \param colliderDef p2ColliderDef definition of the collider
@@ -79,6 +80,7 @@ public:
 	void SetPosition(const p2Vec2 position);
 	p2BodyType GetType() const;
 	float GetMass() const;
+	p2AABB GetAABB() const;
 private:
 	p2AABB aabb;
 	p2Vec2 position;

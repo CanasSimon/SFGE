@@ -29,6 +29,8 @@ SOFTWARE.
 #include <stddef.h>
 #include <array>
 #include <vector>
+//Externals
+#include <SFML/Graphics.hpp>
 
 enum ShapeType
 {
@@ -43,6 +45,7 @@ class p2Shape
 {
 public:
 	ShapeType type;
+	void SetFillColor(sf::Color color) const;
 };
 
 /**

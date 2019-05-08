@@ -224,8 +224,7 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
 		.def_property("velocity", &Body2d::GetLinearVelocity, &Body2d::SetLinearVelocity)
 		.def("apply_force", &Body2d::ApplyForce)
 		.def_property_readonly("body_type", &Body2d::GetType)
-		.def_property_readonly("mass", &Body2d::GetMass)
-		.def_property_readonly("p2body", &Body2d::GetBody);
+		.def_property_readonly("mass", &Body2d::GetMass);
 
 
 	py::class_<p2Body,std::unique_ptr<p2Body, py::nodelete>> body(m, "Body");
@@ -233,7 +232,8 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
 		.def_property("velocity", &p2Body::GetLinearVelocity, &p2Body::SetLinearVelocity)
 		.def("apply_force", &p2Body::ApplyForceToCenter)
 		.def_property_readonly("body_type", &p2Body::GetType)
-		.def_property_readonly("mass", &p2Body::GetMass);
+		.def_property_readonly("mass", &p2Body::GetMass)
+		.def("get_aabb_extends", &p2Body::GetAABBExtends);
 		
 	py::enum_<p2BodyType>(body, "BodyType")
 		.value("STATIC_BODY", p2BodyType::STATIC)
@@ -250,7 +250,6 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
 	shape
 	.def(py::init(), py::return_value_policy::reference)
 		.def("set_fill_color", &Shape::SetFillColor);
-
 	py::class_<Sprite> sprite(m, "Sprite");
 	sprite
 		.def("set_texture", &Sprite::SetTexture, py::return_value_policy::reference);
