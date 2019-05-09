@@ -22,6 +22,9 @@ namespace sfge::ext
 
 		auto* entityManager = m_Engine.GetEntityManager();
 
+		const auto config = m_Engine.GetConfig();
+		screenSize = sf::Vector2f(config->screenResolution.x, config->screenResolution.y);
+
 		entities = entityManager->GetEntitiesWithType(ComponentType::BODY2D);
 		for (auto& entity : entities)
 		{
@@ -33,6 +36,26 @@ namespace sfge::ext
 	void DrawAABB::OnUpdate(float dt)
 	{
 		(void)dt;
+
+		for (auto& body : bodies)
+		{
+			const auto velocity = body->GetLinearVelocity();
+
+			for (auto& collider : body->GetColliders())
+			{
+				std::cout << collider.GetAABB().bottom << " : " << pixel2meter(screenSize).y << "\n" << "------------------------" << "\n";
+				if (collider.GetAABB().right > pixel2meter(screenSize).x && velocity.x > 0 || collider.GetAABB().left < 0 && velocity.x < 0)
+				{
+					body->SetLinearVelocity(p2Vec2(-velocity.x, velocity.y));
+					break;
+				}
+				if (collider.GetAABB().top > pixel2meter(screenSize).y && velocity.y > 0 || collider.GetAABB().bottom < 0 && velocity.y < 0)
+				{
+					body->SetLinearVelocity(p2Vec2(velocity.x, -velocity.y));
+					break;
+				}
+			}
+		}
 	}
 
 	void DrawAABB::OnFixedUpdate()
@@ -44,19 +67,26 @@ namespace sfge::ext
 	void DrawAABB::OnDraw()
 	{
 		rmt_ScopedCPUSample(DrawAABBDraw, 0);
-		for (auto& body : bodies)
+		for (auto body : bodies)
 		{
 			DrawAABBShape(body->GetAABB());
+			for (auto& collider : body->GetColliders())
+			{
+				//std::cout << collider.GetAABB().top << ":" << collider.GetAABB().bottom << "\n";
+				DrawAABBShape(collider.GetAABB());
+			}
 		}
+
+		m_Graphics2DManager->DrawLine(Vec2f(0, 0), screenSize, sf::Color::Green);
 	}
 
 	void DrawAABB::DrawAABBShape(p2AABB aabb) const
 	{
-		std::cout << aabb.GetTopRight().x << ":" << aabb.GetTopRight().y << "\n";
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.GetTopRight())), meter2pixel(p2Vec2(aabb.GetTopLeft())), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.GetTopRight())), meter2pixel(p2Vec2(aabb.GetBottomRight())), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.GetBottomLeft())), meter2pixel(p2Vec2(aabb.GetTopLeft())), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.GetBottomLeft())), meter2pixel(p2Vec2(aabb.GetBottomRight())), sf::Color::Red);
+		//std::cout << aabb.topRight().x << ":" << aabb.topRight().y << "\n";
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.right, aabb.top)), meter2pixel(p2Vec2(aabb.left, aabb.top)), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.right, aabb.top)), meter2pixel(p2Vec2(aabb.right, aabb.bottom)), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.left, aabb.bottom)), meter2pixel(p2Vec2(aabb.left, aabb.top)), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.left, aabb.bottom)), meter2pixel(p2Vec2(aabb.right, aabb.bottom)), sf::Color::Red);
 	}
 
 }

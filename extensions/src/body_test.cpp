@@ -27,7 +27,6 @@ namespace sfge::ext
 		const auto config = m_Engine.GetConfig();
 		screenSize = sf::Vector2f(config->screenResolution.x, config->screenResolution.y);
 		auto* entityManager = m_Engine.GetEntityManager();
-		entityManager->ResizeEntityNmb(entitiesNmb);
 	}
 
 	void BodyTest::OnUpdate(float dt)

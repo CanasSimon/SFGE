@@ -22,30 +22,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include <p2body.h>
-#include <iostream>
 
 void p2Body::Init(p2BodyDef* bodyDef)
 {
-	m_Colliders.resize(MAX_COLLIDER_LEN);
+	maxColliderCount = bodyDef->maxColliderCount;
+	m_Colliders.resize(maxColliderCount);
 	position = bodyDef->position;
 	linearVelocity = bodyDef->linearVelocity;
 	type = bodyDef->type;
 
 	if (bodyDef->mass == 0) mass = 1;
 	else { mass = bodyDef->mass; }
-
-	RebuildAABB();
 }
 
 void p2Body::RebuildAABB()
 {
-	if(m_Colliders.empty()) return;
+	if (m_Colliders.empty()) return;
 
-	const p2Vec2 halfExtend = m_Colliders[0].GetHalfExtend();
-	aabb.topRight = position + halfExtend;
-	aabb.bottomLeft = position - halfExtend;
-	aabb.topLeft = position + p2Vec2(-halfExtend.x, halfExtend.y);
-	aabb.bottomRight = position + p2Vec2(halfExtend.x, -halfExtend.y);
+	for (auto& collider : m_Colliders)
+	{
+		collider.RebuildAABB(position);
+	}
 }
 
 p2Vec2 p2Body::GetLinearVelocity() const
@@ -57,6 +54,7 @@ void p2Body::SetLinearVelocity(p2Vec2 velocity)
 {
 	linearVelocity = velocity;
 }
+
 float p2Body::GetAngularVelocity() const
 {
 	return angularVelocity;
@@ -67,9 +65,10 @@ p2Vec2 p2Body::GetPosition() const
 	return position;
 }
 
-p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
+p2Collider* p2Body::CreateCollider(p2ColliderDef* colliderDef)
 {
 	p2Collider& collider = m_Colliders[m_ColliderIndex];
+	collider.Init(colliderDef);
 	m_ColliderIndex++;
 	return &collider;
 }
@@ -102,4 +101,9 @@ float p2Body::GetMass() const
 p2AABB p2Body::GetAABB() const
 {
 	return aabb;
+}
+
+std::vector<p2Collider> p2Body::GetColliders() const
+{
+	return m_Colliders;
 }

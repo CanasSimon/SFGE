@@ -1,5 +1,5 @@
-#ifndef SFGE_EXT_DRAW_AABB_H
-#define SFGE_EXT_DRAW_AABB_H
+#ifndef SFGE_EXT_BODY_TEST_H
+#define SFGE_EXT_BODY_TEST_H
 
 #include <engine/system.h>
 #include <graphics/graphics2d.h>
@@ -36,8 +36,6 @@ namespace sfge::ext
 		TextureManager* m_TextureManager;
 		SpriteManager* m_SpriteManager;
 		Graphics2dManager* m_Graphics2DManager;
-
-		const size_t entitiesNmb = 10;
 
 		sf::Vector2f screenSize;
 		std::vector<p2Body*> bodies;

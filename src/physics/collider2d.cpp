@@ -31,33 +31,29 @@ namespace sfge
 {
 void editor::ColliderInfo::DrawOnInspector()
 {
-  ImGui::Separator();
-  ImGui::Text("Collider");
-  if(data != nullptr)
-  {
-    if(data->fixture != nullptr)
-    {
-		/*
-      switch (data->fixture->GetShape()->m_type)
-      {
-      	case b2Shape::e_circle:
-      		ImGui::LabelText("Shape", "Circle");
-      		break;
-        case b2Shape::e_polygon:
-        	ImGui::LabelText("Shape", "Polygon");
-        	break;
-      	case b2Shape::e_chain:
-      		ImGui::LabelText("Shape", "Chain");
-			break;
-		case b2Shape::e_edge:
-			ImGui::LabelText("Shape", "Edge");
-		  	break;
-		  default:
-		  	break;
-      }
-		*/
-    }
-  }
+	ImGui::Separator();
+	ImGui::Text("Collider");
+	if (data != nullptr)
+	{
+		if (data->fixture != nullptr)
+		{
+			switch (data->fixture->GetType())
+			{
+			case p2ColliderType::CIRCLE:
+				ImGui::LabelText("Type", "Circle");
+				break;
+			case p2ColliderType::RECT:
+				ImGui::LabelText("Type", "Rectangle");
+				break;
+			case p2ColliderType::POLY:
+				ImGui::LabelText("Type", "Polygon");
+				break;
+			default:
+				ImGui::LabelText("Type", "None");
+				break;
+			}
+		}
+	}
 }
 
 
@@ -85,40 +81,53 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 
 		if (CheckJsonExists(componentJson, "collider_type"))
 		{
-			ColliderType colliderType = static_cast<ColliderType>(componentJson["collider_type"]);
+			auto colliderType = static_cast<ColliderType>(componentJson["collider_type"]);
 			switch (colliderType)
 			{
 			case ColliderType::CIRCLE:
-				shape = std::make_unique<p2CircleShape>();
-				if (CheckJsonNumber(componentJson, "radius"))
 				{
-					//shape->m_radius = pixel2meter(static_cast<float>(componentJson["radius"]));
+					auto circleShape = std::make_unique<p2CircleShape>();
+					if (CheckJsonNumber(componentJson, "radius"))
+					{
+						const auto radius = pixel2meter(static_cast<float>(componentJson["radius"]));
+						{
+							std::ostringstream oss;
+							oss << "Circle physics radius: " << radius;
+							Log::GetInstance()->Msg(oss.str());
+						}
+						circleShape->SetRadius(radius);
+					}
+					shape = std::move(circleShape);
 				}
 				break;
 			case ColliderType::BOX:
-			{
-				auto boxShape = std::make_unique<p2RectShape>();
-				if (CheckJsonExists(componentJson, "size"))
 				{
-					auto size = pixel2meter(GetVectorFromJson(componentJson, "size"));
+					auto boxShape = std::make_unique<p2RectShape>();
+					if (CheckJsonExists(componentJson, "size"))
 					{
-						std::ostringstream oss;
-						oss << "Box physics size: " << size.x << ", " << size.y;
-						Log::GetInstance()->Msg(oss.str());
+						const auto size = pixel2meter(GetVectorFromJson(componentJson, "size"));
+						{
+							std::ostringstream oss;
+							oss << "Box physics size: " << size.x << ", " << size.y;
+							Log::GetInstance()->Msg(oss.str());
+						}
+						boxShape->SetSize(size / 2.0f);
 					}
-					//boxShape->SetAsBox(size.x / 2.0f, size.y / 2.0f);
+					shape = std::move(boxShape);
 				}
-				shape = std::move(boxShape);
-			}	
-			break;
+				break;
 			default:
-			{
-				std::ostringstream oss;
-				oss << "[Error] Collider of type: " << static_cast<int>(colliderType) << " could not be loaded from json: " << componentJson;
-				Log::GetInstance()->Error(oss.str());
-			}
+				{
+					system("pause");
+					std::ostringstream oss;
+					oss << "[Error] Collider of type: " << static_cast<int>(colliderType) <<
+						" could not be loaded from json: " << componentJson;
+					Log::GetInstance()->Error(oss.str());
+				}
 				break;
 			}
+
+			fixtureDef.m_ColliderType = static_cast<p2ColliderType>(componentJson["collider_type"]);
 		}
 		if(CheckJsonNumber(componentJson, "bouncing"))
 		{

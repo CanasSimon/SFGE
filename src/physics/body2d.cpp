@@ -209,6 +209,10 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		{
 			bodyDef.gravityScale = componentJson["gravity_scale"];
 		}
+		if (CheckJsonNumber(componentJson, "max_colliders"))
+		{
+			bodyDef.maxColliderCount = componentJson["max_colliders"];
+		}
 
 		const auto offset = GetVectorFromJson(componentJson, "offset");
 		const auto velocity = GetVectorFromJson(componentJson, "velocity");

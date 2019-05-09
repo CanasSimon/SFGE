@@ -235,7 +235,7 @@ TEST(Physics, TestShapeContactCpp)
 			{"radius",100}
 		}
 	};
-	json colliders[] =
+	json colliderShapes[] =
 	{
 		{
 			{"name","Rect Collider"},
@@ -268,12 +268,12 @@ TEST(Physics, TestShapeContactCpp)
 			{"name", "Rigidbody"},
 			{"type", sfge::ComponentType::BODY2D},
 			{"body_type",  p2BodyType::DYNAMIC},
+			{"max_colliders",  1},
 			{"velocity", {rand() % 400, rand() % 400}}
 		};
 
 		const int randShapeIndex = rand() % 2;
-		entityJson["components"] = { transformJson, shapes[randShapeIndex], rigidbody, colliders[randShapeIndex] };
-
+		entityJson["components"] = { transformJson, shapes[randShapeIndex], rigidbody, colliderShapes[randShapeIndex] };
 	}
 
 	sceneJson["entities"] = entities;

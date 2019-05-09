@@ -46,6 +46,7 @@ class p2Shape
 public:
 	ShapeType type;
 	void SetFillColor(sf::Color color) const;
+	virtual void Dummy();
 };
 
 /**

@@ -32,44 +32,45 @@ SOFTWARE.
 
 namespace sfge
 {
+	enum class ColliderType
+	{
+		NONE,
+		CIRCLE,
+		BOX,
+		POLYGON
+	};
 
-enum class ColliderType
-{
-	NONE,
-	CIRCLE,
-	BOX,
-	POLYGON
-};
+	struct ColliderData
+	{
+		Entity entity = INVALID_ENTITY;
+		p2Collider* fixture = nullptr;
+		p2Body* body = nullptr;
+	};
 
-struct ColliderData
-{
-	Entity entity = INVALID_ENTITY;
-	p2Collider* fixture = nullptr;
-	p2Body* body = nullptr;
-};
-namespace editor
-{
-struct ColliderInfo : ComponentInfo
-{
-    ColliderData* data;
-	void DrawOnInspector() override;
-};
-}
-class ColliderManager : public MultipleComponentManager<ColliderData, editor::ColliderInfo, ComponentType::COLLIDER2D>
-{
-public:
-	using MultipleComponentManager::MultipleComponentManager;
-	void OnEngineInit() override;
-	ColliderData* AddComponent(Entity entity) override;
-	void CreateComponent(json& componentJson, Entity entity)override;
-	void DestroyComponent(Entity entity) override;
-  	ColliderData* GetComponentPtr(Entity entity) override;
-protected:
+	namespace editor
+	{
+		struct ColliderInfo : ComponentInfo
+		{
+			ColliderData* data;
+			void DrawOnInspector() override;
+		};
+	}
 
-  	int GetFreeComponentIndex() override;
-	Body2dManager* m_BodyManager = nullptr;
-};
+	class ColliderManager : public MultipleComponentManager<
+			ColliderData, editor::ColliderInfo, ComponentType::COLLIDER2D>
+	{
+	public:
+		using MultipleComponentManager::MultipleComponentManager;
+		void OnEngineInit() override;
+		ColliderData* AddComponent(Entity entity) override;
+		void CreateComponent(json& componentJson, Entity entity) override;
+		void DestroyComponent(Entity entity) override;
+		ColliderData* GetComponentPtr(Entity entity) override;
+	protected:
 
+		int GetFreeComponentIndex() override;
+		Body2dManager* m_BodyManager = nullptr;
+	};
 }
 
 #endif

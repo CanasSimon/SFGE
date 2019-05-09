@@ -49,10 +49,8 @@ struct p2BodyDef
 	p2Vec2 linearVelocity;
 	float gravityScale;
 	float mass;
-	
+	size_t maxColliderCount;
 };
-
-const size_t MAX_COLLIDER_LEN = 8;
 
 /**
 * \brief Rigidbody representation
@@ -63,11 +61,11 @@ public:
 	void Init(p2BodyDef* bodyDef);
 	void RebuildAABB();
 	p2Vec2 GetLinearVelocity() const;
-	
+
 	void SetLinearVelocity(p2Vec2 velocity);
 
 	float GetAngularVelocity() const;
-	
+
 	p2Vec2 GetPosition() const;
 	/**
 	* \brief Factory method creating a p2Collider
@@ -81,6 +79,7 @@ public:
 	p2BodyType GetType() const;
 	float GetMass() const;
 	p2AABB GetAABB() const;
+	std::vector<p2Collider> GetColliders() const;
 private:
 	p2AABB aabb;
 	p2Vec2 position;
@@ -89,6 +88,7 @@ private:
 	float mass = 1;
 	p2BodyType type = p2BodyType::DYNAMIC;
 
+	size_t maxColliderCount = 1;
 	int m_ColliderIndex = 0;
 	std::vector<p2Collider> m_Colliders;
 };
