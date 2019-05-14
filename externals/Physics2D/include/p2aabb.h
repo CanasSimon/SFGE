@@ -26,16 +26,19 @@ SOFTWARE.
 #define SFGE_P2AABB_H
 
 #include <p2vector.h>
+#include <vector>
 
 /**
 * \brief Struct representing a Axis Aligned Bounding Box
 */
 struct p2AABB
 {
-	float left = 0;
-	float right = 0;
-	float bottom = 0;
-	float top = 0;
+	p2Vec2 left = {0, 0};
+	p2Vec2 right = { 0, 0 };
+	p2Vec2 bottom = { 0, 0 };
+	p2Vec2 top = { 0, 0 };
+
+	std::vector<p2Vec2> m_Vertices;
 
 	p2Vec2 GetCenter() const;
 	p2Vec2 GetExtends() const;

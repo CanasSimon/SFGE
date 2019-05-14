@@ -27,7 +27,7 @@ SOFTWARE.
 
 p2World::p2World(p2Vec2 gravity): m_Gravity(gravity)
 {
-	m_Bodies.resize(MAX_BODY_LEN);
+	m_Bodies.resize(maxBodyCount);
 }
 
 void p2World::Step(float dt)

@@ -116,6 +116,22 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 					shape = std::move(boxShape);
 				}
 				break;
+			/*case ColliderType::POLYGON:
+				{
+					auto polyShape = std::make_unique<p2PolygonShape>();
+					if (CheckJsonExists(componentJson, "points"))
+					{
+						const auto points = componentJson["points"];
+						{
+							std::ostringstream oss;
+							oss << "Polygon points count: " << points.size();
+							Log::GetInstance()->Msg(oss.str());
+						}
+						polyShape->SetPoints(points);
+					}
+					shape = std::move(polyShape);
+				}
+				break;*/
 			default:
 				{
 					system("pause");

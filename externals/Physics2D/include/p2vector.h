@@ -29,7 +29,7 @@ struct p2Vec3;
 
 struct p2Vec2
 {
-
+	virtual ~p2Vec2() = default;
 	p2Vec2();
 
 	p2Vec2(float x, float y);
@@ -54,6 +54,7 @@ struct p2Vec2
 	p2Vec2 Rotate(float angle) const;
 	static p2Vec2 Lerp(const p2Vec2& v1, const p2Vec2& v2, float t);
 	static float AngleBetween(const p2Vec2& v1, const p2Vec2& v2);
+	static p2Vec2 GetVectorFrom(const p2Vec2& v1, const p2Vec2& v2);
 	void ProjectOn(const p2Vec2 & v1);
 	p2Vec2 GetNormal() const;
 	p2Vec2 GetReflection(const p2Vec2& n) const;

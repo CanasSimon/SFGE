@@ -250,7 +250,19 @@ TEST(Physics, TestShapeContactCpp)
 			{"collider_type",sfge::ColliderType::CIRCLE},
 			{"radius",100},
 			{"sensor",true}
-		}
+		}/*,
+		{
+			{"name","Poly Collider"},
+			{"type", sfge::ComponentType::COLLIDER2D},
+			{"collider_type",sfge::ColliderType::POLYGON},
+			{"points",
+				{1, 1},
+				{1, -1},
+				{-1, -1},
+				{-1, 1 }
+			},
+			{"sensor",true}
+		}*/
 	};
 
 	for (int i = 0; i < entitiesNmb; i++)
@@ -283,6 +295,9 @@ TEST(Physics, TestShapeContactCpp)
 			},
 			{
 				{"systemClassName", "BodyTest"}
+			},
+			{
+				{"systemClassName", "DrawSAT"}
 			}
 		}
 	);

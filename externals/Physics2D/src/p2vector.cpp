@@ -142,6 +142,11 @@ float p2Vec2::AngleBetween(const p2Vec2& v1, const p2Vec2& v2)
 	return acos(Dot(v1, v2) / (v1.GetMagnitude() * v2.GetMagnitude()));
 }
 
+p2Vec2 p2Vec2::GetVectorFrom(const p2Vec2& v1, const p2Vec2& v2)
+{
+	return {v2.x - v1.x, v2.y - v1.y};
+}
+
 void p2Vec2::ProjectOn(const p2Vec2& v1)
 {
 	const float dot = Dot(*this, v1);

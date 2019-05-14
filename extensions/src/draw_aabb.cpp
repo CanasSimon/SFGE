@@ -43,13 +43,12 @@ namespace sfge::ext
 
 			for (auto& collider : body->GetColliders())
 			{
-				std::cout << collider.GetAABB().bottom << " : " << pixel2meter(screenSize).y << "\n" << "------------------------" << "\n";
-				if (collider.GetAABB().right > pixel2meter(screenSize).x && velocity.x > 0 || collider.GetAABB().left < 0 && velocity.x < 0)
+				if (collider.GetAABB().right.x > pixel2meter(screenSize).x && velocity.x > 0 || collider.GetAABB().left.x < 0 && velocity.x < 0)
 				{
 					body->SetLinearVelocity(p2Vec2(-velocity.x, velocity.y));
 					break;
 				}
-				if (collider.GetAABB().top > pixel2meter(screenSize).y && velocity.y > 0 || collider.GetAABB().bottom < 0 && velocity.y < 0)
+				if (collider.GetAABB().top.y > pixel2meter(screenSize).y && velocity.y > 0 || collider.GetAABB().bottom.y < 0 && velocity.y < 0)
 				{
 					body->SetLinearVelocity(p2Vec2(velocity.x, -velocity.y));
 					break;
@@ -83,10 +82,10 @@ namespace sfge::ext
 	void DrawAABB::DrawAABBShape(p2AABB aabb) const
 	{
 		//std::cout << aabb.topRight().x << ":" << aabb.topRight().y << "\n";
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.right, aabb.top)), meter2pixel(p2Vec2(aabb.left, aabb.top)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.right, aabb.top)), meter2pixel(p2Vec2(aabb.right, aabb.bottom)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.left, aabb.bottom)), meter2pixel(p2Vec2(aabb.left, aabb.top)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.left, aabb.bottom)), meter2pixel(p2Vec2(aabb.right, aabb.bottom)), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.right.x, aabb.top.y)), meter2pixel(p2Vec2(aabb.left.x, aabb.top.y)), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.right.x, aabb.top.y)), meter2pixel(p2Vec2(aabb.right.x, aabb.bottom.y)), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.left.x, aabb.bottom.y)), meter2pixel(p2Vec2(aabb.left.x, aabb.top.y)), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.left.x, aabb.bottom.y)), meter2pixel(p2Vec2(aabb.right.x, aabb.bottom.y)), sf::Color::Red);
 	}
 
 }

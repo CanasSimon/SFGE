@@ -28,6 +28,7 @@ SOFTWARE.
 #include <extensions/python_extensions.h>
 #include <extensions/planet_system.h>
 #include <extensions/draw_aabb.h>
+#include <extensions/draw_sat.h>
 #include <extensions/body_test.h>
 
 #include <tools/tools_pch.h>
@@ -44,6 +45,10 @@ void ExtendPython(py::module& m)
 
 	py::class_<DrawAABB, System> drawAABB(m, "DrawAABB");
 	drawAABB
+		.def(py::init<Engine&>());
+
+	py::class_<DrawSAT, System> drawSAT(m, "DrawSAT");
+	drawSAT
 		.def(py::init<Engine&>());
 
 	py::class_<BodyTest, System> bodyTest(m, "BodyTest");

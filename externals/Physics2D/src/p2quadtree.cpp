@@ -35,24 +35,24 @@ void p2QuadTree::Split()
 	const p2Vec2 extends = m_Bounds.GetExtends();
 
 	// Set the current position
-	p2Vec2 currentPosition = p2Vec2(m_Bounds.left, m_Bounds.bottom);
+	p2Vec2 currentPosition = p2Vec2(m_Bounds.left.x, m_Bounds.bottom.y);
 
 	// Define the size of the child sides depending on the amount of child tree number
-	const float childSideSize = (m_Bounds.top - currentPosition.y) / sqrt(CHILD_TREE_NMB);
+	const float childSideSize = (m_Bounds.top.y - currentPosition.y) / sqrt(CHILD_TREE_NMB);
 
 	for (int i = 0; i < CHILD_TREE_NMB; i++)
 	{
 		p2AABB childAABB;
 
-		childAABB.bottom = currentPosition.y;
-		childAABB.left = currentPosition.x;
+		childAABB.bottom = p2Vec2(0, currentPosition.y);
+		childAABB.left = p2Vec2(currentPosition.x, 0);
 
-		childAABB.top = currentPosition.y + childSideSize;
-		childAABB.right = currentPosition.x + childSideSize;
+		childAABB.top = p2Vec2(0, currentPosition.y + childSideSize);
+		childAABB.right = p2Vec2(currentPosition.x + childSideSize, 0);
 
 		// Check if it needs to jump on the y axis
 		if (currentPosition.x + childSideSize >= extends.x)
-			currentPosition = { m_Bounds.bottom, currentPosition.y + childSideSize };
+			currentPosition = { m_Bounds.bottom.x, currentPosition.y + childSideSize };
 		else
 			currentPosition.x = currentPosition.x + childSideSize;
 

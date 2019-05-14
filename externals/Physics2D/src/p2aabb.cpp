@@ -26,10 +26,10 @@ SOFTWARE.
 
 p2Vec2 p2AABB::GetCenter() const
 {
-	return {right + left / 2, top + bottom / 2};
+	return {right.x + left.x / 2, top.y + bottom.y / 2};
 }
 
 p2Vec2 p2AABB::GetExtends() const
 {
-	return {left + right, bottom + top};
+	return {right.x - left.x, top.y - bottom.y};
 }

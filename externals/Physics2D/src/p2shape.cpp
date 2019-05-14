@@ -24,11 +24,6 @@ SOFTWARE.
 
 #include <p2shape.h>
 
-void p2Shape::Dummy()
-{
-
-}
-
 p2CircleShape::p2CircleShape(float radius) : p2Shape()
 {
 	type = CIRCLE;
@@ -78,4 +73,9 @@ p2PolygonShape::p2PolygonShape(std::vector<p2Vec2> points) : p2Shape()
 void p2PolygonShape::SetPoints(std::vector<p2Vec2> points)
 {
 	m_Points = points;
+}
+
+std::vector<p2Vec2> p2PolygonShape::GetPoints() const
+{
+	return m_Points;
 }

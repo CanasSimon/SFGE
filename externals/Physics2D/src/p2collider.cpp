@@ -1,7 +1,7 @@
 #include "..\include\p2collider.h"
 #include <iostream>
 
-p2Collider::p2Collider(): m_Shape(), m_ColliderType()
+p2Collider::p2Collider(): m_ColliderType()
 
 {
 }
@@ -29,7 +29,17 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 		}
 	case p2ColliderType::POLY:
 		{
-			halfExtend = p2Vec2(0, 0);
+			const auto polyShape = dynamic_cast<p2PolygonShape*>(m_Shape);
+
+			float right = 0;
+			float top = 0;
+			for (auto& point : polyShape->GetPoints())
+			{
+				if (point.x > right) right = point.x;
+				if (point.y > top) top = point.y;
+			}
+
+			halfExtend = p2Vec2(right, top);
 			break;
 		}
 	default:
@@ -42,13 +52,27 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 
 void p2Collider::RebuildAABB(p2Vec2 bodyPos)
 {
-	aabb.right = bodyPos.x + halfExtend.x;
-	aabb.left = bodyPos.x - halfExtend.x;
-	aabb.top = bodyPos.y + halfExtend.y;
-	aabb.bottom = bodyPos.y - halfExtend.y;
+	aabb.right = p2Vec2(bodyPos.x + halfExtend.x, bodyPos.y);
+	aabb.left = p2Vec2(bodyPos.x - halfExtend.x, bodyPos.y);
+	aabb.top = p2Vec2(bodyPos.x, bodyPos.y + halfExtend.y);
+	aabb.bottom = p2Vec2(bodyPos.x, bodyPos.y - halfExtend.y);
+
+	switch (m_ColliderType)
+	{
+	case p2ColliderType::RECT:
+		{
+			aabb.m_Vertices.push_back(bodyPos + halfExtend);
+			aabb.m_Vertices.emplace_back(bodyPos + p2Vec2(halfExtend.x, -halfExtend.y));
+			aabb.m_Vertices.push_back(bodyPos + halfExtend);
+			aabb.m_Vertices.emplace_back(bodyPos + p2Vec2(-halfExtend.x, halfExtend.y));
+		}
+		break;
+	default: 
+		break;
+	}
 }
 
-p2Collider::p2Collider(p2ColliderDef colDef): m_Shape(), m_ColliderType(), colliderDefinition()
+p2Collider::p2Collider(p2ColliderDef colDef): m_ColliderType()
 {
 }
 

@@ -26,8 +26,6 @@ SOFTWARE.
 #define SFGE_P2SHAPE_H
 
 #include <p2vector.h>
-#include <stddef.h>
-#include <array>
 #include <vector>
 //Externals
 #include <SFML/Graphics.hpp>
@@ -44,9 +42,9 @@ enum ShapeType
 class p2Shape
 {
 public:
+	virtual ~p2Shape() = default;
+
 	ShapeType type;
-	void SetFillColor(sf::Color color) const;
-	virtual void Dummy();
 };
 
 /**
@@ -79,6 +77,7 @@ public:
 	p2PolygonShape();
 	p2PolygonShape(std::vector<p2Vec2> points);
 	void SetPoints(std::vector<p2Vec2> points);
+	std::vector<p2Vec2> GetPoints() const;
 private:
 	std::vector<p2Vec2> m_Points;
 };

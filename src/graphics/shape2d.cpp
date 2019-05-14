@@ -96,14 +96,14 @@ void editor::ShapeInfo::DrawOnInspector ()
 		};
 
 		ImGui::InputFloat2("Offset", offset);
-		auto circleShape = dynamic_cast<sf::CircleShape*>(shapePtr->GetShape());
+		const auto circleShape = dynamic_cast<sf::CircleShape*>(shapePtr->GetShape());
 		if(circleShape != nullptr)
 		{
 			float radius = circleShape->getRadius ();
 			ImGui::InputFloat ("Radius", &radius);
 		}
 
-		auto rectShape = dynamic_cast<sf::RectangleShape*>(shapePtr->GetShape ());
+		const auto rectShape = dynamic_cast<sf::RectangleShape*>(shapePtr->GetShape ());
 		if(rectShape != nullptr)
 		{
 			float size[2] =
@@ -113,6 +113,13 @@ void editor::ShapeInfo::DrawOnInspector ()
 			};
 			ImGui::InputFloat2("Size", size);
 		}
+
+		/*const auto polyShape = dynamic_cast<sf::ConvexShape*>(shapePtr->GetShape());
+		if (rectShape != nullptr)
+		{
+			float pointsCount = polyShape->getPointCount();
+			ImGui::InputFloat2("Points", &pointsCount);
+		}*/
 	}
 }
 
@@ -198,40 +205,47 @@ void ShapeManager::CreateComponent(json& componentJson, Entity entity)
 		switch (shapeType)
 		{
 		case ShapeType::CIRCLE:
-		{
-
-			float radius = 10.0f;
-			if (CheckJsonNumber(componentJson, "radius"))
 			{
-				radius = componentJson["radius"];
-			}
+				float radius = 10.0f;
+				if (CheckJsonNumber(componentJson, "radius"))
+				{
+					radius = componentJson["radius"];
+				}
 
-			auto circleShape = std::make_unique <sf::CircleShape>();
-			circleShape->setRadius (radius);
-			circleShape->setOrigin (radius, radius);
-			shape.SetShape (std::move(circleShape));
-			shape.Update ();
-		}
+				auto circleShape = std::make_unique<sf::CircleShape>();
+				circleShape->setRadius(radius);
+				circleShape->setOrigin(radius, radius);
+				shape.SetShape(std::move(circleShape));
+				shape.Update();
+			}
 			break;
 		case ShapeType::RECTANGLE:
-		{
-			sf::Vector2f offset;
-			if (CheckJsonExists(componentJson, "offset"))
 			{
-				offset = GetVectorFromJson(componentJson, "offset");
+				sf::Vector2f offset;
+				if (CheckJsonExists(componentJson, "offset"))
+				{
+					offset = GetVectorFromJson(componentJson, "offset");
+				}
+				sf::Vector2f size = sf::Vector2f();
+				if (CheckJsonExists(componentJson, "size"))
+				{
+					size = GetVectorFromJson(componentJson, "size");
+				}
+				auto rect = std::make_unique<sf::RectangleShape>();
+				rect->setSize(size);
+				rect->setOrigin(size.x / 2.0f, size.y / 2.0f);
+				shape.SetShape(std::move(rect));
+				shape.Update();
 			}
-			sf::Vector2f size = sf::Vector2f();
-			if (CheckJsonExists(componentJson, "size"))
+			break;
+		case ShapeType::POLYGON:
 			{
-				size = GetVectorFromJson(componentJson, "size");
+				std::vector<Vec2f> points;
+				if (CheckJsonExists(componentJson, "points"))
+				{
+
+				}
 			}
-			auto rect = std::make_unique<sf::RectangleShape>();
-			rect->setSize (size);
-			rect->setOrigin (size.x/2.0f, size.y/2.0f);
-            shape.SetShape (std::move (rect));
-            shape.Update ();
-			
-		}
 			break;
 		default:
 			Log::GetInstance()->Error("Invalid shape type in ShapeManager Component Creation");
