@@ -81,6 +81,10 @@ void p2Body::ApplyForceToCenter(const p2Vec2& force)
 void p2Body::Offset(const p2Vec2 offset)
 {
 	position += offset;
+	for (auto& collider : m_Colliders)
+	{
+		collider.m_Position = position + collider.m_Offset;
+	}
 }
 
 void p2Body::SetPosition(const p2Vec2 position)

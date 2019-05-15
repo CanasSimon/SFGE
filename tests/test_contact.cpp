@@ -45,7 +45,7 @@ TEST(Physics, TestSAT)
 
 		json transformJson =
 		{
-			{"position", 600, 400},
+			{"position", {600, 400}},
 			{"type", sfge::ComponentType::TRANSFORM2D}
 		};
 
@@ -53,7 +53,7 @@ TEST(Physics, TestSAT)
 		{
 			{"name", "Rigidbody"},
 			{"type", sfge::ComponentType::BODY2D},
-			{"body_type",  p2BodyType::STATIC},
+			{"body_type",  p2BodyType::DYNAMIC},
 			{"max_colliders",  1}
 		};
 
@@ -64,6 +64,9 @@ TEST(Physics, TestSAT)
 	sceneJson["systems"] = json::array({
 			{
 				{"systemClassName", "DrawAABB"}
+			},
+			{
+				{"systemClassName", "BodyTest"}
 			},
 			{
 				{"systemClassName", "DrawSAT"}

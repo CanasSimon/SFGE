@@ -54,33 +54,34 @@ namespace sfge::ext
 				DrawSATShape(collider);
 			}
 		}
-
-		m_Graphics2DManager->DrawLine(Vec2f(0, 0), screenSize, sf::Color::Green);
 	}
 
 	void DrawSAT::DrawSATShape(p2Collider collider) const
 	{
+		const auto aabb = collider.GetAABB();
 		switch (collider.GetType())
 		{
+		case p2ColliderType::CIRCLE:
+			m_Graphics2DManager->DrawLine(meter2pixel(collider.m_Position), meter2pixel(aabb.right), sf::Color::Blue);
+			break;
 		case p2ColliderType::RECT:
 			{
-			const auto aabb = collider.GetAABB();
-				for (int i = 0; i < aabb.m_Vertices.size(); ++i)
+				p2Vec2 edge;
+				p2Vec2 edgePos;
+				for (int i = aabb.m_Vertices.size() - 1; i >= 0; --i)
 				{
-					p2Vec2 edge;
-					if(i + 1 < aabb.m_Vertices.size())
+					if (i - 1 >= 0)
 					{
-						edge = p2Vec2().GetVectorFrom(aabb.m_Vertices[i], aabb.m_Vertices[i + 1]);
-						m_Graphics2DManager->DrawLine(meter2pixel(aabb.m_Vertices[i]),
-						                              meter2pixel(aabb.m_Vertices[i + 1]), sf::Color::Blue);
+						edge = p2Vec2().GetVectorFrom(aabb.m_Vertices[i], aabb.m_Vertices[i - 1]);
+						edgePos = (aabb.m_Vertices[i] + aabb.m_Vertices[i - 1]) / 2;
 					}
 					else
 					{
-						edge = p2Vec2().GetVectorFrom(aabb.m_Vertices[i], aabb.m_Vertices[0]);
-						m_Graphics2DManager->DrawLine(meter2pixel(aabb.m_Vertices[i]),
-						                              meter2pixel(aabb.m_Vertices[0]), sf::Color::Blue);
+						edge = p2Vec2().GetVectorFrom(aabb.m_Vertices[i], aabb.m_Vertices[aabb.m_Vertices.size() - 1]);
+						edgePos = (aabb.m_Vertices[i] + aabb.m_Vertices[aabb.m_Vertices.size() - 1]) / 2;
 					}
 
+					m_Graphics2DManager->DrawLine(meter2pixel(edgePos), meter2pixel(edgePos + edge.GetNormal()), sf::Color::Blue);
 				}
 			}
 			break;

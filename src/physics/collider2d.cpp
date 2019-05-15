@@ -156,6 +156,7 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 			auto index = GetFreeComponentIndex();
 			if(index != -1)
 			{
+				fixtureDef.position = body.GetBody()->GetPosition();
 				auto* fixture = body.GetBody()->CreateCollider(&fixtureDef);
 
 

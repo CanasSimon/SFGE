@@ -27,8 +27,6 @@ SOFTWARE.
 
 #include <p2vector.h>
 #include <vector>
-//Externals
-#include <SFML/Graphics.hpp>
 
 enum ShapeType
 {

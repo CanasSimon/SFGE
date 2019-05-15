@@ -1,5 +1,4 @@
 #include "..\include\p2collider.h"
-#include <iostream>
 
 p2Collider::p2Collider(): m_ColliderType()
 
@@ -10,6 +9,7 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 {
 	userData = colliderDef->userData;
 	m_Shape = colliderDef->shape;
+	m_Position = colliderDef->position;
 	m_ColliderType = colliderDef->m_ColliderType;
 	colliderDefinition = *colliderDef;
 
@@ -25,6 +25,8 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 		{
 			const auto rectShape = dynamic_cast<p2RectShape*>(m_Shape);
 			halfExtend = rectShape->GetSize();
+
+			aabb.m_Vertices.resize(4);
 			break;
 		}
 	case p2ColliderType::POLY:
@@ -61,10 +63,10 @@ void p2Collider::RebuildAABB(p2Vec2 bodyPos)
 	{
 	case p2ColliderType::RECT:
 		{
-			aabb.m_Vertices.push_back(bodyPos + halfExtend);
-			aabb.m_Vertices.emplace_back(bodyPos + p2Vec2(halfExtend.x, -halfExtend.y));
-			aabb.m_Vertices.push_back(bodyPos + halfExtend);
-			aabb.m_Vertices.emplace_back(bodyPos + p2Vec2(-halfExtend.x, halfExtend.y));
+			aabb.m_Vertices[0] = bodyPos + halfExtend;
+			aabb.m_Vertices[1] = bodyPos + p2Vec2(halfExtend.x, -halfExtend.y);
+			aabb.m_Vertices[2] = bodyPos - halfExtend;
+			aabb.m_Vertices[3] = bodyPos - p2Vec2(halfExtend.x, -halfExtend.y);
 		}
 		break;
 	default: 
@@ -90,6 +92,11 @@ p2Shape* p2Collider::GetShape() const
 {
 	return m_Shape;
 }
+
+/*p2Body* p2Collider::GetBody() const
+{
+	return m_Body;
+}*/
 
 p2ColliderType p2Collider::GetType() const
 {
