@@ -149,6 +149,10 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 		{
 			fixtureDef.restitution = componentJson["bouncing"];
 		}
+		if (CheckJsonExists(componentJson, "offset"))
+		{
+			fixtureDef.offset = pixel2meter(GetVectorFromJson(componentJson, "offset"));
+		}
 		if (shape != nullptr)
 		{
 			fixtureDef.shape = shape.get();

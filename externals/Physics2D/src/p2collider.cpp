@@ -10,6 +10,7 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 	userData = colliderDef->userData;
 	m_Shape = colliderDef->shape;
 	m_Position = colliderDef->position;
+	m_Offset = colliderDef->offset;
 	m_ColliderType = colliderDef->m_ColliderType;
 	colliderDefinition = *colliderDef;
 
@@ -52,21 +53,21 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 	}
 }
 
-void p2Collider::RebuildAABB(p2Vec2 bodyPos)
+void p2Collider::RebuildAABB(const p2Vec2& bodyPos, float bodyRot)
 {
-	aabb.right = p2Vec2(bodyPos.x + halfExtend.x, bodyPos.y);
-	aabb.left = p2Vec2(bodyPos.x - halfExtend.x, bodyPos.y);
-	aabb.top = p2Vec2(bodyPos.x, bodyPos.y + halfExtend.y);
-	aabb.bottom = p2Vec2(bodyPos.x, bodyPos.y - halfExtend.y);
+	aabb.topRight = bodyPos + m_Offset + halfExtend.Rotate(bodyRot);
+	aabb.topLeft = bodyPos + m_Offset + p2Vec2(-halfExtend.x, halfExtend.y).Rotate(bodyRot);
+	aabb.bottomRight = bodyPos + m_Offset + p2Vec2(halfExtend.x, -halfExtend.y).Rotate(bodyRot);
+	aabb.bottomLeft = bodyPos + m_Offset - halfExtend.Rotate(bodyRot);
 
 	switch (m_ColliderType)
 	{
 	case p2ColliderType::RECT:
 		{
-			aabb.m_Vertices[0] = bodyPos + halfExtend;
-			aabb.m_Vertices[1] = bodyPos + p2Vec2(halfExtend.x, -halfExtend.y);
-			aabb.m_Vertices[2] = bodyPos - halfExtend;
-			aabb.m_Vertices[3] = bodyPos - p2Vec2(halfExtend.x, -halfExtend.y);
+			aabb.m_Vertices[0] = bodyPos + m_Offset + halfExtend.Rotate(bodyRot);
+			aabb.m_Vertices[1] = bodyPos + m_Offset + p2Vec2(halfExtend.x, -halfExtend.y).Rotate(bodyRot);
+			aabb.m_Vertices[2] = bodyPos + m_Offset - halfExtend.Rotate(bodyRot);
+			aabb.m_Vertices[3] = bodyPos + m_Offset - p2Vec2(halfExtend.x, -halfExtend.y).Rotate(bodyRot);
 		}
 		break;
 	default: 

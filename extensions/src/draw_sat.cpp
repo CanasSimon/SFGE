@@ -11,12 +11,13 @@ namespace sfge::ext
 {
 
 	DrawSAT::DrawSAT(Engine& engine) :
-		System(engine), m_Body2DManager(), m_Graphics2DManager()
+		System(engine), m_Transform2DManager(), m_Body2DManager(), m_Graphics2DManager()
 	{
 	}
 
 	void DrawSAT::OnEngineInit()
 	{
+		m_Transform2DManager = m_Engine.GetTransform2dManager();
 		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
 		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
 
@@ -28,8 +29,10 @@ namespace sfge::ext
 		entities = entityManager->GetEntitiesWithType(ComponentType::BODY2D);
 		for (auto& entity : entities)
 		{
+			const auto transform = m_Transform2DManager->GetComponentPtr(entity);
 			const auto body = m_Body2DManager->GetComponentPtr(entity);
 			bodies.push_back(body->GetBody());
+			transforms.push_back(transform);
 		}
 	}
 
@@ -42,6 +45,7 @@ namespace sfge::ext
 	{
 		rmt_ScopedCPUSample(DrawSATFixedUpdate, 0);
 
+		transforms[0]->EulerAngle += 1;
 	}
 
 	void DrawSAT::OnDraw()
@@ -62,7 +66,7 @@ namespace sfge::ext
 		switch (collider.GetType())
 		{
 		case p2ColliderType::CIRCLE:
-			m_Graphics2DManager->DrawLine(meter2pixel(collider.m_Position), meter2pixel(aabb.right), sf::Color::Blue);
+			m_Graphics2DManager->DrawLine(meter2pixel(collider.m_Position), meter2pixel(p2Vec2(aabb.topRight.x, 0)), sf::Color::Blue);
 			break;
 		case p2ColliderType::RECT:
 			{

@@ -31,12 +31,14 @@ namespace sfge::ext
 		void OnDraw() override;
 
 	private:
+		Transform2dManager* m_Transform2DManager;
 		Body2dManager* m_Body2DManager;
 		Graphics2dManager* m_Graphics2DManager;
 
 		void DrawSATShape(p2Collider collider) const;
 
 		sf::Vector2f screenSize;
+		std::vector<Transform2d*> transforms;
 		std::vector<p2Body*> bodies;
 		std::vector<Entity> entities;
 	};

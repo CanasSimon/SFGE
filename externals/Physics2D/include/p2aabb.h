@@ -33,10 +33,10 @@ SOFTWARE.
 */
 struct p2AABB
 {
-	p2Vec2 left = {0, 0};
-	p2Vec2 right = { 0, 0 };
-	p2Vec2 bottom = { 0, 0 };
-	p2Vec2 top = { 0, 0 };
+	p2Vec2 topRight = { 0, 0 };
+	p2Vec2 topLeft = {0, 0};
+	p2Vec2 bottomRight = { 0, 0 };
+	p2Vec2 bottomLeft = { 0, 0 };
 
 	std::vector<p2Vec2> m_Vertices;
 

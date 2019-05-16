@@ -30,12 +30,22 @@ TEST(Physics, TestSAT)
 		{"size", {100, 100}}
 	};
 
-	json colliderShape =
+	json colliderShape1 =
 	{
 		{"name", "Rect Collider"},
 		{"type", sfge::ComponentType::COLLIDER2D},
 		{"collider_type", sfge::ColliderType::BOX},
 		{"size", {100, 100}},
+		{"sensor", true}
+	};
+
+	json colliderShape2 =
+	{
+		{"name", "Rect Collider"},
+		{"type", sfge::ComponentType::COLLIDER2D},
+		{"collider_type", sfge::ColliderType::BOX},
+		{"size", {100, 100}},
+		{"offset", {10, 10}},
 		{"sensor", true}
 	};
 
@@ -45,7 +55,7 @@ TEST(Physics, TestSAT)
 
 		json transformJson =
 		{
-			{"position", {600, 400}},
+			{"position", {400 + std::rand() % (800 - 400 + 1), 200 + std::rand() % (600 - 200 + 1)}},
 			{"type", sfge::ComponentType::TRANSFORM2D}
 		};
 
@@ -57,7 +67,7 @@ TEST(Physics, TestSAT)
 			{"max_colliders",  1}
 		};
 
-		entityJson["components"] = { transformJson, shape, rigidbody, colliderShape };
+		entityJson["components"] = { transformJson, shape, rigidbody, colliderShape1, colliderShape2 };
 	}
 
 	sceneJson["entities"] = entities;

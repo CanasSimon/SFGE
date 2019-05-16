@@ -46,6 +46,7 @@ struct p2BodyDef
 {
 	p2BodyType type;
 	p2Vec2 position;
+	float rotation;
 	p2Vec2 linearVelocity;
 	float gravityScale;
 	float mass;
@@ -67,6 +68,7 @@ public:
 	float GetAngularVelocity() const;
 
 	p2Vec2 GetPosition() const;
+	float GetRotation() const;
 	/**
 	* \brief Factory method creating a p2Collider
 	* \param colliderDef p2ColliderDef definition of the collider
@@ -74,8 +76,9 @@ public:
 	*/
 	p2Collider* CreateCollider(p2ColliderDef* colliderDef);
 	void ApplyForceToCenter(const p2Vec2& force);
-	void Offset(const p2Vec2 offset);
-	void SetPosition(const p2Vec2 position);
+	void Offset(p2Vec2 offset);
+	void SetPosition(p2Vec2 position);
+	void SetRotation(float rotation);
 	p2BodyType GetType() const;
 	float GetMass() const;
 	p2AABB GetAABB() const;
@@ -83,6 +86,7 @@ public:
 private:
 	p2AABB aabb;
 	p2Vec2 position;
+	float rotation;
 	p2Vec2 linearVelocity;
 	float angularVelocity;
 	float mass = 1;

@@ -25,6 +25,10 @@ SOFTWARE.
 #include <p2vector.h>
 #include <cmath>
 #include "engine/vector.h"
+#include <corecrt_math_defines.h>
+#include <cstdlib>
+
+#define _USE_MATH_DEFINES
 
 /*********************
  * p2Vec2 operations *
@@ -52,9 +56,34 @@ bool p2Vec2::operator!=(const p2Vec2& rhs) const
 	return x != rhs.x && y != rhs.y;
 }
 
+bool p2Vec2::operator>(const p2Vec2& rhs) const
+{
+	return x > rhs.x && y > rhs.y;
+}
+
+bool p2Vec2::operator>=(const p2Vec2& rhs) const
+{
+	return x >= rhs.x && y >= rhs.y;
+}
+
+bool p2Vec2::operator<(const p2Vec2& rhs) const
+{
+	return x < rhs.x && y < rhs.y;
+}
+
+bool p2Vec2::operator<=(const p2Vec2& rhs) const
+{
+	return x <= rhs.x && y <= rhs.y;
+}
+
 p2Vec2 p2Vec2::operator+(const p2Vec2& v) const
 {
 	return {x + v.x, y + v.y};
+}
+
+p2Vec2 p2Vec2::operator+(const float& rhs) const
+{
+	return {x + rhs, y + rhs};
 }
 
 p2Vec2& p2Vec2::operator+=(const p2Vec2& v)
@@ -127,8 +156,14 @@ void p2Vec2::NormalizeSelf()
 	y = y / magnitude;
 }
 
+p2Vec2 p2Vec2::Absolute() const
+{
+	return {abs(x), abs(y)};
+}
+
 p2Vec2 p2Vec2::Rotate(float angle) const
 {
+	angle *= M_PI / 180.0f;
 	return {x * cos(angle) - y * sin(angle), x * sin(angle) + y * cos(angle)};
 }
 

@@ -28,7 +28,6 @@ SOFTWARE.
 
 #include <p2shape.h>
 #include <p2aabb.h>
-#include <p2body.h>
 
 enum class p2ColliderType
 {
@@ -46,6 +45,7 @@ struct p2ColliderDef
 	void* userData;
 	p2Shape* shape;
 	p2Vec2 position;
+	p2Vec2 offset = { 0, 0 };
 	float restitution;
 	bool isSensor = false;
 	p2ColliderType m_ColliderType;
@@ -59,7 +59,7 @@ class p2Collider
 {
 public:
 	void Init(p2ColliderDef* colliderDef);
-	void RebuildAABB(p2Vec2 bodyPos);
+	void RebuildAABB(const p2Vec2& bodyPos, float bodyRot);
 	p2Collider();
 	p2Collider(p2ColliderDef colDef);
 	bool IsSensor() const;

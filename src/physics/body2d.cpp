@@ -163,8 +163,11 @@ void Body2dManager::OnFixedUpdate()
 		{
 			auto & transform = m_Transform2dManager->GetComponentRef(entity);
 			auto & body2d = GetComponentRef(entity);
+
 			m_ComponentsInfo[i].AddVelocity(body2d.GetLinearVelocity());
 			transform.Position = meter2pixel(body2d.GetBody()->GetPosition()) - static_cast<sf::Vector2f>(body2d.GetOffset());
+			body2d.GetBody()->SetRotation(transform.EulerAngle);
+			body2d.GetBody()->RebuildAABB();
 		}
 	}
 }
@@ -178,7 +181,9 @@ Body2d* Body2dManager::AddComponent(Entity entity)
 
 		auto* transform = m_Transform2dManager->GetComponentPtr(entity);
 		const auto pos = transform->Position;
+		const auto rot = transform->EulerAngle;
 		bodyDef.position = pixel2meter(pos);
+		bodyDef.rotation = rot;
 
 		auto* body = world->CreateBody(&bodyDef);
 		m_Components[entity - 1] = Body2d(transform, sf::Vector2f());
@@ -219,7 +224,9 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 
 		auto* transform = m_Transform2dManager->GetComponentPtr(entity);
 		const auto pos = transform->Position + offset;
+		const auto rot = transform->EulerAngle;
 		bodyDef.position = pixel2meter(pos);
+		bodyDef.rotation = rot;
 		bodyDef.mass = 1;
 		
 		auto* body = world->CreateBody(&bodyDef);

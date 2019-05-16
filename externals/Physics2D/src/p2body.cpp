@@ -28,8 +28,11 @@ void p2Body::Init(p2BodyDef* bodyDef)
 	maxColliderCount = bodyDef->maxColliderCount;
 	m_Colliders.resize(maxColliderCount);
 	position = bodyDef->position;
+	rotation = bodyDef->rotation;
 	linearVelocity = bodyDef->linearVelocity;
 	type = bodyDef->type;
+
+	aabb.topRight = aabb.topLeft = aabb.bottomRight = aabb.bottomLeft = position;
 
 	if (bodyDef->mass == 0) mass = 1;
 	else { mass = bodyDef->mass; }
@@ -41,7 +44,36 @@ void p2Body::RebuildAABB()
 
 	for (auto& collider : m_Colliders)
 	{
-		collider.RebuildAABB(position);
+		collider.RebuildAABB(position, rotation);
+
+		aabb.topRight = aabb.bottomRight = aabb.bottomLeft = aabb.topLeft = position;
+
+		const auto colliderAABB = collider.GetAABB();
+		for (auto& vertex : colliderAABB.m_Vertices)
+		{
+			if(vertex.x > aabb.topRight.x || vertex.x > aabb.bottomRight.x)
+			{
+				aabb.topRight.x = vertex.x;
+				aabb.bottomRight.x = vertex.x;
+			}
+			if (vertex.x < aabb.topLeft.x || vertex.x < aabb.bottomLeft.x)
+			{
+				aabb.topLeft.x = vertex.x;
+				aabb.bottomLeft.x = vertex.x;
+			}
+
+			if (vertex.y > aabb.topRight.y || vertex.y > aabb.topLeft.y)
+			{
+				aabb.topRight.y = vertex.y;
+				aabb.topLeft.y = vertex.y;
+			}
+			if (vertex.y < aabb.bottomRight.y || vertex.y < aabb.bottomLeft.y)
+			{
+				aabb.bottomRight.y = vertex.y;
+				aabb.bottomLeft.y = vertex.y;
+			}
+		}
+
 	}
 }
 
@@ -65,6 +97,11 @@ p2Vec2 p2Body::GetPosition() const
 	return position;
 }
 
+float p2Body::GetRotation() const
+{
+	return rotation;
+}
+
 p2Collider* p2Body::CreateCollider(p2ColliderDef* colliderDef)
 {
 	p2Collider& collider = m_Colliders[m_ColliderIndex];
@@ -78,7 +115,7 @@ void p2Body::ApplyForceToCenter(const p2Vec2& force)
 	linearVelocity += force / mass;
 }
 
-void p2Body::Offset(const p2Vec2 offset)
+void p2Body::Offset(p2Vec2 offset)
 {
 	position += offset;
 	for (auto& collider : m_Colliders)
@@ -87,9 +124,14 @@ void p2Body::Offset(const p2Vec2 offset)
 	}
 }
 
-void p2Body::SetPosition(const p2Vec2 position)
+void p2Body::SetPosition(p2Vec2 position)
 {
 	this->position = position;
+}
+
+void p2Body::SetRotation(float rotation)
+{
+	this->rotation = rotation;
 }
 
 p2BodyType p2Body::GetType() const

@@ -34,7 +34,7 @@ namespace sfge::ext
 		Body2dManager* m_Body2DManager;
 		Graphics2dManager* m_Graphics2DManager;
 
-		void DrawAABBShape(p2AABB aabb) const;
+		void DrawAABBShape(p2AABB aabb, sf::Color color) const;
 
 		sf::Vector2f screenSize;
 		std::vector<p2Body*> bodies;
