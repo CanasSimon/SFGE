@@ -27,6 +27,7 @@ SOFTWARE.
 #include "engine/vector.h"
 #include <corecrt_math_defines.h>
 #include <cstdlib>
+#include <algorithm>
 
 #define _USE_MATH_DEFINES
 
@@ -189,6 +190,12 @@ void p2Vec2::ProjectOn(const p2Vec2& v1)
 	y = dot / pow(v1.GetMagnitude(), 2) * v1.y;
 }
 
+p2Vec2 p2Vec2::GetProjectionOn(const p2Vec2& v1) const
+{
+	const float dot = Dot(*this, v1);
+	return { dot / pow(v1.GetMagnitude(), 2) * v1.x, dot / pow(v1.GetMagnitude(), 2) * v1.y };
+}
+
 p2Vec2 p2Vec2::GetNormal() const
 {
 	return {y, -x};
@@ -199,6 +206,17 @@ p2Vec2 p2Vec2::GetReflection(const p2Vec2& n) const
 	p2Vec2 nor = n.GetNormal().Normalized();
 	const float dot = Dot(*this, nor);
 	return *this - nor * 2 * Dot(*this, nor);
+}
+
+bool p2Vec2::OnSegment(const p2Vec2& v1, const p2Vec2& v2) const
+{
+	return v1.x <= std::max(x, v2.x) && v1.x >= std::min(x, v2.x) && 
+		v1.y <= std::max(y, v2.y) && v1.y >= std::min(y, v2.y);
+}
+
+bool p2Vec2::DoOverlap(const p2Vec2& v1, const p2Vec2& v2, const p2Vec2& w1, const p2Vec2& w2)
+{
+	return v1.OnSegment(w1, v2) || v1.OnSegment(w2, v2) || w1.OnSegment(v1, w2) || w1.OnSegment(v2, w2);
 }
 
 /*********************

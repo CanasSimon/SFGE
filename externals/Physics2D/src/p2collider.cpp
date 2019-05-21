@@ -7,27 +7,28 @@ p2Collider::p2Collider(): m_ColliderType()
 
 void p2Collider::Init(p2ColliderDef* colliderDef)
 {
-	userData = colliderDef->userData;
+	m_UserData = colliderDef->userData;
 	m_Shape = colliderDef->shape;
-	m_Position = colliderDef->position;
-	m_Offset = colliderDef->offset;
-	m_ColliderType = colliderDef->m_ColliderType;
-	colliderDefinition = *colliderDef;
+	position = colliderDef->position;
+	offset = colliderDef->offset;
+	m_ColliderType = colliderDef->colliderType;
+	m_ColliderDefinition = *colliderDef;
 
 	switch (m_ColliderType)
 	{
 	case p2ColliderType::CIRCLE:
 		{
 			const auto circleShape = dynamic_cast<p2CircleShape*>(m_Shape);
-			halfExtend = p2Vec2(circleShape->GetRadius(), circleShape->GetRadius());
+			m_HalfExtend = p2Vec2(circleShape->GetRadius(), circleShape->GetRadius());
 			break;
 		}
 	case p2ColliderType::RECT:
 		{
 			const auto rectShape = dynamic_cast<p2RectShape*>(m_Shape);
-			halfExtend = rectShape->GetSize();
+			m_HalfExtend = rectShape->GetSize();
 
-			aabb.m_Vertices.resize(4);
+			m_Aabb.vertices.resize(4);
+			m_Aabb.edges.resize(4);
 			break;
 		}
 	case p2ColliderType::POLY:
@@ -42,12 +43,12 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 				if (point.y > top) top = point.y;
 			}
 
-			halfExtend = p2Vec2(right, top);
+			m_HalfExtend = p2Vec2(right, top);
 			break;
 		}
 	default:
 		{
-			halfExtend = p2Vec2(0, 0);
+			m_HalfExtend = p2Vec2(0, 0);
 			break;
 		}
 	}
@@ -55,19 +56,24 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 
 void p2Collider::RebuildAABB(const p2Vec2& bodyPos, float bodyRot)
 {
-	aabb.topRight = bodyPos + m_Offset + halfExtend.Rotate(bodyRot);
-	aabb.topLeft = bodyPos + m_Offset + p2Vec2(-halfExtend.x, halfExtend.y).Rotate(bodyRot);
-	aabb.bottomRight = bodyPos + m_Offset + p2Vec2(halfExtend.x, -halfExtend.y).Rotate(bodyRot);
-	aabb.bottomLeft = bodyPos + m_Offset - halfExtend.Rotate(bodyRot);
+	m_Aabb.topRight = bodyPos + (offset + m_HalfExtend).Rotate(bodyRot);
+	m_Aabb.bottomRight = bodyPos + (offset + p2Vec2(m_HalfExtend.x, -m_HalfExtend.y)).Rotate(bodyRot);
+	m_Aabb.bottomLeft = bodyPos + (offset - m_HalfExtend).Rotate(bodyRot);
+	m_Aabb.topLeft = bodyPos + (offset + p2Vec2(-m_HalfExtend.x, m_HalfExtend.y)).Rotate(bodyRot);
 
 	switch (m_ColliderType)
 	{
 	case p2ColliderType::RECT:
 		{
-			aabb.m_Vertices[0] = bodyPos + m_Offset + halfExtend.Rotate(bodyRot);
-			aabb.m_Vertices[1] = bodyPos + m_Offset + p2Vec2(halfExtend.x, -halfExtend.y).Rotate(bodyRot);
-			aabb.m_Vertices[2] = bodyPos + m_Offset - halfExtend.Rotate(bodyRot);
-			aabb.m_Vertices[3] = bodyPos + m_Offset - p2Vec2(halfExtend.x, -halfExtend.y).Rotate(bodyRot);
+			m_Aabb.vertices[0] = bodyPos + (offset + m_HalfExtend).Rotate(bodyRot);
+			m_Aabb.vertices[1] = bodyPos + (offset + p2Vec2(m_HalfExtend.x, -m_HalfExtend.y)).Rotate(bodyRot);
+			m_Aabb.vertices[2] = bodyPos + (offset - m_HalfExtend).Rotate(bodyRot);
+			m_Aabb.vertices[3] = bodyPos + (offset + p2Vec2(-m_HalfExtend.x, m_HalfExtend.y)).Rotate(bodyRot);
+
+			m_Aabb.edges[0] = p2Vec2().GetVectorFrom(m_Aabb.vertices[0], m_Aabb.vertices[1]);
+			m_Aabb.edges[1] = p2Vec2().GetVectorFrom(m_Aabb.vertices[1], m_Aabb.vertices[2]);
+			m_Aabb.edges[2] = p2Vec2().GetVectorFrom(m_Aabb.vertices[2], m_Aabb.vertices[3]);
+			m_Aabb.edges[3] = p2Vec2().GetVectorFrom(m_Aabb.vertices[3], m_Aabb.vertices[0]);
 		}
 		break;
 	default: 
@@ -81,12 +87,12 @@ p2Collider::p2Collider(p2ColliderDef colDef): m_ColliderType()
 
 bool p2Collider::IsSensor() const
 {
-	return colliderDefinition.isSensor;
+	return m_ColliderDefinition.isSensor;
 }
 
 void* p2Collider::GetUserData() const
 {
-	return userData;
+	return m_UserData;
 }
 
 p2Shape* p2Collider::GetShape() const
@@ -106,15 +112,15 @@ p2ColliderType p2Collider::GetType() const
 
 void p2Collider::SetUserData(void* colliderData)
 {
-	userData = colliderData;
+	m_UserData = colliderData;
 }
 
 p2Vec2 p2Collider::GetHalfExtend() const
 {
-	return halfExtend;
+	return m_HalfExtend;
 }
 
 p2AABB p2Collider::GetAABB() const
 {
-	return aabb;
+	return m_Aabb;
 }

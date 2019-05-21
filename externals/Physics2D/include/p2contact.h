@@ -35,6 +35,10 @@ class p2Contact
 public:
 	p2Collider* GetColliderA();
 	p2Collider* GetColliderB();
+
+	void SAT(std::vector<p2Collider> colliders);
+private:
+	bool m_IsContact = false;
 };
 
 /**

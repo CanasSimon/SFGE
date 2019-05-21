@@ -1,9 +1,11 @@
-#ifndef SFGE_EXT_DRAW_SAT_H
-#define SFGE_EXT_DRAW_SAT_H
+#ifndef SFGE_EXT_DEBUG_H
+#define SFGE_EXT_DEBUG_H
 
 #include <engine/system.h>
 #include <graphics/graphics2d.h>
 #include "p2body.h"
+#include "input/input.h"
+#include <p2world.h>
 
 
 namespace sfge
@@ -17,10 +19,10 @@ namespace sfge
 
 namespace sfge::ext
 {
-	class DrawSAT : public System
+	class Debug : public System
 	{
 	public:
-		DrawSAT(Engine& engine);
+		Debug(Engine& engine);
 
 		void OnEngineInit() override;
 
@@ -31,10 +33,17 @@ namespace sfge::ext
 		void OnDraw() override;
 
 	private:
+		Physics2dManager* m_PhysicsManager;
+		p2World* m_World;
+
 		Transform2dManager* m_Transform2DManager;
 		Body2dManager* m_Body2DManager;
 		Graphics2dManager* m_Graphics2DManager;
 
+		InputManager* m_InputManager;
+		KeyboardManager* m_KeyboardManager;
+
+		void DrawAABBShape(p2AABB aabb, sf::Color color) const;
 		void DrawSATShape(p2Collider collider) const;
 
 		std::vector<p2Vec2> axes;
@@ -43,6 +52,10 @@ namespace sfge::ext
 		std::vector<Transform2d*> transforms;
 		std::vector<p2Body*> bodies;
 		std::vector<Entity> entities;
+
+		bool drawAabb = false;
+		bool drawSat = false;
+		bool drawQuadTree = false;
 	};
 }
 

@@ -82,7 +82,7 @@ public:
 
 private:
 	Transform2dManager* m_Transform2dManager;
-	std::weak_ptr<p2World> m_WorldPtr;
+	p2World* m_WorldPtr;
 };
 
 

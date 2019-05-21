@@ -22,12 +22,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include <p2world.h>
-#include <iostream>
+#include <p2quadtree.h>
 
 
 p2World::p2World(p2Vec2 gravity): m_Gravity(gravity)
 {
-	m_Bodies.resize(maxBodyCount);
+	m_Bodies.resize(MAX_BODY_LEN);
+
+	m_QuadTreeBounds.bottomLeft = p2Vec2(0, 0);
+	m_QuadTreeBounds.topLeft = p2Vec2(0, 1);
+	m_QuadTreeBounds.topRight = p2Vec2(1, 1);
+	m_QuadTreeBounds.bottomRight = p2Vec2(1, 0);
+
+	m_QuadTree = new p2QuadTree(0, m_QuadTreeBounds);
+	for (auto& body : m_Bodies)
+	{
+		m_QuadTree->Insert(&body);
+	}
 }
 
 void p2World::Step(float dt)
@@ -41,7 +52,11 @@ void p2World::Step(float dt)
 		}
 	}
 
-	// TODO Quadtree
+
+	for (auto& child : m_QuadTree->GetChildren())
+	{
+
+	}
 
 	// TODO Check for collision
 }
@@ -56,4 +71,9 @@ p2Body* p2World::CreateBody(p2BodyDef* bodyDef)
 
 void p2World::SetContactListener(p2ContactListener* contactListener)
 {
+}
+
+p2QuadTree* p2World::GetQuadTree() const
+{
+	return m_QuadTree;
 }

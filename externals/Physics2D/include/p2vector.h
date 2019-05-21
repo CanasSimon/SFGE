@@ -62,8 +62,12 @@ struct p2Vec2
 	static float AngleBetween(const p2Vec2& v1, const p2Vec2& v2);
 	static p2Vec2 GetVectorFrom(const p2Vec2& v1, const p2Vec2& v2);
 	void ProjectOn(const p2Vec2 & v1);
+	p2Vec2 GetProjectionOn(const p2Vec2& v1) const;
 	p2Vec2 GetNormal() const;
 	p2Vec2 GetReflection(const p2Vec2& n) const;
+
+	bool OnSegment(const p2Vec2& v1, const p2Vec2& v2) const;
+	static bool DoOverlap(const p2Vec2& v1, const p2Vec2& v2, const p2Vec2& w1, const p2Vec2& w2);
 
 	p2Vec3 to3() const;
 

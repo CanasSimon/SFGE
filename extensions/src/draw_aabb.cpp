@@ -81,7 +81,7 @@ namespace sfge::ext
 
 	void DrawAABB::DrawAABBShape(p2AABB aabb, sf::Color color) const
 	{
-		//std::cout << aabb.topRight().x << ":" << aabb.topRight().y << "\n";
+		//std::cout << m_Aabb.topRight().x << ":" << m_Aabb.topRight().y << "\n";
 		m_Graphics2DManager->DrawLine(meter2pixel(aabb.topRight), meter2pixel(aabb.topLeft), color);
 		m_Graphics2DManager->DrawLine(meter2pixel(aabb.topRight), meter2pixel(aabb.bottomRight), color);
 		m_Graphics2DManager->DrawLine(meter2pixel(aabb.bottomLeft), meter2pixel(aabb.topLeft), color);

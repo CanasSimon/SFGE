@@ -4,8 +4,6 @@
 #include <graphics/graphics2d.h>
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
-#include <iostream>
-
 
 namespace sfge::ext
 {
@@ -51,6 +49,18 @@ namespace sfge::ext
 	void DrawSAT::OnDraw()
 	{
 		rmt_ScopedCPUSample(DrawSATDraw, 0);
+		axes.clear();
+		for (auto body : bodies)
+		{
+			for (auto& collider : body->GetColliders())
+			{
+				for (auto& edge : collider.GetAABB().edges)
+				{
+					axes.push_back(edge.GetNormal());
+				}
+			}
+		}
+
 		for (auto body : bodies)
 		{
 			for (auto& collider : body->GetColliders())
@@ -66,31 +76,37 @@ namespace sfge::ext
 		switch (collider.GetType())
 		{
 		case p2ColliderType::CIRCLE:
-			m_Graphics2DManager->DrawLine(meter2pixel(collider.m_Position), meter2pixel(p2Vec2(aabb.topRight.x, 0)), sf::Color::Blue);
+			m_Graphics2DManager->DrawLine(meter2pixel(collider.position), meter2pixel(p2Vec2(aabb.topRight.x, 0)),
+			                              sf::Color::Blue);
 			break;
 		case p2ColliderType::RECT:
 			{
-				p2Vec2 edge;
-				p2Vec2 edgePos;
-				for (int i = aabb.m_Vertices.size() - 1; i >= 0; --i)
+				for (auto& axis : axes)
 				{
-					if (i - 1 >= 0)
+					for (auto& vertex : aabb.vertices)
 					{
-						edge = p2Vec2().GetVectorFrom(aabb.m_Vertices[i], aabb.m_Vertices[i - 1]);
-						edgePos = (aabb.m_Vertices[i] + aabb.m_Vertices[i - 1]) / 2;
+						m_Graphics2DManager->DrawLine(meter2pixel(aabb.GetCenter()), meter2pixel(vertex.GetProjectionOn(axis)),
+							sf::Color::Blue);
+						m_Graphics2DManager->DrawVector(meter2pixel(aabb.edges[0]), meter2pixel(vertex));
 					}
-					else
-					{
-						edge = p2Vec2().GetVectorFrom(aabb.m_Vertices[i], aabb.m_Vertices[aabb.m_Vertices.size() - 1]);
-						edgePos = (aabb.m_Vertices[i] + aabb.m_Vertices[aabb.m_Vertices.size() - 1]) / 2;
-					}
-
-					m_Graphics2DManager->DrawLine(meter2pixel(edgePos), meter2pixel(edgePos + edge.GetNormal()), sf::Color::Blue);
 				}
+				
 			}
 			break;
 		default:
 			break;
 		}
+
+		const auto offset = p2Vec2(1, 1);
+		const auto temp1 = p2Vec2(4, 4);
+		const auto temp2 = p2Vec2(5.1, 5.1);
+		const auto vector1 = p2Vec2().GetVectorFrom(temp1, temp1 + offset);
+		const auto vector2 = p2Vec2().GetVectorFrom(temp2, temp2 + offset);
+		m_Graphics2DManager->DrawLine(meter2pixel(temp1), meter2pixel(temp1 + offset), sf::Color::Magenta);
+		m_Graphics2DManager->DrawLine(meter2pixel(temp2), meter2pixel(temp2 + offset), sf::Color::Green);
+
+		if (p2Vec2().DoOverlap(temp1, temp1 + offset, temp2, temp2 + offset))
+			m_Graphics2DManager->DrawLine(meter2pixel(temp1 + p2Vec2(1, 1)), 
+				meter2pixel(temp2 + p2Vec2(1, 1)), sf::Color::Red);
 	}
 }

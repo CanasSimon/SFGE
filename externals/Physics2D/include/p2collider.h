@@ -48,7 +48,7 @@ struct p2ColliderDef
 	p2Vec2 offset = { 0, 0 };
 	float restitution;
 	bool isSensor = false;
-	p2ColliderType m_ColliderType;
+	p2ColliderType colliderType;
 };
 
 /**
@@ -70,15 +70,15 @@ public:
 	p2Vec2 GetHalfExtend() const;
 	p2AABB GetAABB() const;
 
-	p2Vec2 m_Position;
-	p2Vec2 m_Offset = {0, 0};
+	p2Vec2 position;
+	p2Vec2 offset = {0, 0};
 private:
-	p2AABB aabb;
-	void* userData = nullptr;
+	p2AABB m_Aabb;
+	void* m_UserData = nullptr;
 	p2Shape* m_Shape{};
 	p2ColliderType m_ColliderType;
-	p2ColliderDef colliderDefinition;
-	p2Vec2 halfExtend = p2Vec2(0, 0);
+	p2ColliderDef m_ColliderDefinition;
+	p2Vec2 m_HalfExtend = p2Vec2(0, 0);
 };
 
 

@@ -84,15 +84,16 @@ public:
 	p2AABB GetAABB() const;
 	std::vector<p2Collider> GetColliders() const;
 private:
-	p2AABB aabb;
-	p2Vec2 position;
-	float rotation;
-	p2Vec2 linearVelocity;
-	float angularVelocity;
-	float mass = 1;
-	p2BodyType type = p2BodyType::DYNAMIC;
+	p2BodyDef m_BodyDefinition;
+	p2AABB m_Aabb;
+	p2Vec2 m_Position;
+	float m_Rotation = 0;
+	p2Vec2 m_LinearVelocity;
+	float m_AngularVelocity = 0;
+	float m_Mass = 1;
+	p2BodyType m_Type = p2BodyType::DYNAMIC;
 
-	size_t maxColliderCount = 1;
+	size_t m_MaxColliderCount = 4;
 	int m_ColliderIndex = 0;
 	std::vector<p2Collider> m_Colliders;
 };

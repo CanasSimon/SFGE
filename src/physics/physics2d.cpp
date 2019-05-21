@@ -37,7 +37,7 @@ void Physics2dManager::OnEngineInit()
 	p2Vec2 gravity;
 	if(const auto configPtr = m_Engine.GetConfig())
 		gravity = configPtr->gravity;
-	m_World = std::make_shared<p2World>(gravity);
+	m_World = new p2World(gravity);
 	m_ContactListener = std::make_unique<ContactListener>(m_Engine);
 	m_World->SetContactListener(m_ContactListener.get());
 
@@ -61,7 +61,7 @@ void Physics2dManager::OnFixedUpdate()
 	}
 }
 
-std::weak_ptr<p2World> Physics2dManager::GetWorld() const
+p2World * Physics2dManager::GetWorld() const
 {
 	return m_World;
 }

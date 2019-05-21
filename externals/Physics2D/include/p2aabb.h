@@ -38,7 +38,8 @@ struct p2AABB
 	p2Vec2 bottomRight = { 0, 0 };
 	p2Vec2 bottomLeft = { 0, 0 };
 
-	std::vector<p2Vec2> m_Vertices;
+	std::vector<p2Vec2> vertices;
+	std::vector<p2Vec2> edges;
 
 	p2Vec2 GetCenter() const;
 	p2Vec2 GetExtends() const;

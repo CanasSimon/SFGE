@@ -30,6 +30,7 @@ SOFTWARE.
 
 enum ShapeType
 {
+	NONE,
 	CIRCLE,
 	RECT,
 	POLY

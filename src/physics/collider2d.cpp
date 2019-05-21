@@ -143,7 +143,7 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 				break;
 			}
 
-			fixtureDef.m_ColliderType = static_cast<p2ColliderType>(componentJson["collider_type"]);
+			fixtureDef.colliderType = static_cast<p2ColliderType>(componentJson["collider_type"]);
 		}
 		if(CheckJsonNumber(componentJson, "bouncing"))
 		{

@@ -174,7 +174,7 @@ void Body2dManager::OnFixedUpdate()
 
 Body2d* Body2dManager::AddComponent(Entity entity)
 {
-	if (auto world = m_WorldPtr.lock())
+	if (auto world = m_WorldPtr)
 	{
 		p2BodyDef bodyDef;
 		bodyDef.type = p2BodyType::STATIC;
@@ -203,7 +203,7 @@ Body2d* Body2dManager::AddComponent(Entity entity)
 void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 {
 	//Log::GetInstance()->Msg("Create component Transform");
-	if (auto world = m_WorldPtr.lock())
+	if (auto world = m_WorldPtr)
 	{
 		p2BodyDef bodyDef;
 		if (CheckJsonExists(componentJson, "body_type"))

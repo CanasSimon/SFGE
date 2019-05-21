@@ -28,6 +28,9 @@ SOFTWARE.
 #include <p2vector.h>
 #include <p2body.h>
 #include <p2contact.h>
+#include "p2quadtree.h"
+
+const size_t MAX_BODY_LEN = 256;
 
 /**
 * \brief Representation of the physical world in meter
@@ -49,10 +52,12 @@ public:
 	*/
 	void SetContactListener(p2ContactListener* contactListener);
 
-	size_t maxBodyCount = 256;
+	p2QuadTree * GetQuadTree() const;
 private:
 
 	p2Vec2 m_Gravity;
+	p2AABB m_QuadTreeBounds;
+	p2QuadTree* m_QuadTree;
 	std::vector<p2Body> m_Bodies;
 	int m_BodyIndex = 0;
 };

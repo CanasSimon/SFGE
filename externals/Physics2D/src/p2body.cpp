@@ -25,52 +25,52 @@ SOFTWARE.
 
 void p2Body::Init(p2BodyDef* bodyDef)
 {
-	maxColliderCount = bodyDef->maxColliderCount;
-	m_Colliders.resize(maxColliderCount);
-	position = bodyDef->position;
-	rotation = bodyDef->rotation;
-	linearVelocity = bodyDef->linearVelocity;
-	type = bodyDef->type;
+	m_BodyDefinition = *bodyDef;
+	m_MaxColliderCount = bodyDef->maxColliderCount;
+	m_Colliders.resize(m_MaxColliderCount);
+	m_Position = bodyDef->position;
+	m_Rotation = bodyDef->rotation;
+	m_LinearVelocity = bodyDef->linearVelocity;
+	m_Type = bodyDef->type;
 
-	aabb.topRight = aabb.topLeft = aabb.bottomRight = aabb.bottomLeft = position;
+	m_Aabb.topRight = m_Aabb.topLeft = m_Aabb.bottomRight = m_Aabb.bottomLeft = m_Position;
 
-	if (bodyDef->mass == 0) mass = 1;
-	else { mass = bodyDef->mass; }
+	if (bodyDef->mass == 0) m_Mass = 1;
+	else { m_Mass = bodyDef->mass; }
 }
 
 void p2Body::RebuildAABB()
 {
 	if (m_Colliders.empty()) return;
 
+	m_Aabb.topRight = m_Aabb.bottomRight = m_Aabb.bottomLeft = m_Aabb.topLeft = m_Position;
 	for (auto& collider : m_Colliders)
 	{
-		collider.RebuildAABB(position, rotation);
-
-		aabb.topRight = aabb.bottomRight = aabb.bottomLeft = aabb.topLeft = position;
+		collider.RebuildAABB(m_Position, m_Rotation);
 
 		const auto colliderAABB = collider.GetAABB();
-		for (auto& vertex : colliderAABB.m_Vertices)
+		for (auto& vertex : colliderAABB.vertices)
 		{
-			if(vertex.x > aabb.topRight.x || vertex.x > aabb.bottomRight.x)
+			if(vertex.x > m_Aabb.topRight.x || vertex.x > m_Aabb.bottomRight.x)
 			{
-				aabb.topRight.x = vertex.x;
-				aabb.bottomRight.x = vertex.x;
+				m_Aabb.topRight.x = vertex.x;
+				m_Aabb.bottomRight.x = vertex.x;
 			}
-			if (vertex.x < aabb.topLeft.x || vertex.x < aabb.bottomLeft.x)
+			if (vertex.x < m_Aabb.topLeft.x || vertex.x < m_Aabb.bottomLeft.x)
 			{
-				aabb.topLeft.x = vertex.x;
-				aabb.bottomLeft.x = vertex.x;
+				m_Aabb.topLeft.x = vertex.x;
+				m_Aabb.bottomLeft.x = vertex.x;
 			}
 
-			if (vertex.y > aabb.topRight.y || vertex.y > aabb.topLeft.y)
+			if (vertex.y > m_Aabb.topRight.y || vertex.y > m_Aabb.topLeft.y)
 			{
-				aabb.topRight.y = vertex.y;
-				aabb.topLeft.y = vertex.y;
+				m_Aabb.topRight.y = vertex.y;
+				m_Aabb.topLeft.y = vertex.y;
 			}
-			if (vertex.y < aabb.bottomRight.y || vertex.y < aabb.bottomLeft.y)
+			if (vertex.y < m_Aabb.bottomRight.y || vertex.y < m_Aabb.bottomLeft.y)
 			{
-				aabb.bottomRight.y = vertex.y;
-				aabb.bottomLeft.y = vertex.y;
+				m_Aabb.bottomRight.y = vertex.y;
+				m_Aabb.bottomLeft.y = vertex.y;
 			}
 		}
 
@@ -79,27 +79,27 @@ void p2Body::RebuildAABB()
 
 p2Vec2 p2Body::GetLinearVelocity() const
 {
-	return linearVelocity;
+	return m_LinearVelocity;
 }
 
 void p2Body::SetLinearVelocity(p2Vec2 velocity)
 {
-	linearVelocity = velocity;
+	m_LinearVelocity = velocity;
 }
 
 float p2Body::GetAngularVelocity() const
 {
-	return angularVelocity;
+	return m_AngularVelocity;
 }
 
 p2Vec2 p2Body::GetPosition() const
 {
-	return position;
+	return m_Position;
 }
 
 float p2Body::GetRotation() const
 {
-	return rotation;
+	return m_Rotation;
 }
 
 p2Collider* p2Body::CreateCollider(p2ColliderDef* colliderDef)
@@ -112,41 +112,41 @@ p2Collider* p2Body::CreateCollider(p2ColliderDef* colliderDef)
 
 void p2Body::ApplyForceToCenter(const p2Vec2& force)
 {
-	linearVelocity += force / mass;
+	m_LinearVelocity += force / m_Mass;
 }
 
 void p2Body::Offset(p2Vec2 offset)
 {
-	position += offset;
+	m_Position += offset;
 	for (auto& collider : m_Colliders)
 	{
-		collider.m_Position = position + collider.m_Offset;
+		collider.position = m_Position + collider.offset;
 	}
 }
 
 void p2Body::SetPosition(p2Vec2 position)
 {
-	this->position = position;
+	this->m_Position = position;
 }
 
 void p2Body::SetRotation(float rotation)
 {
-	this->rotation = rotation;
+	this->m_Rotation = rotation;
 }
 
 p2BodyType p2Body::GetType() const
 {
-	return type;
+	return m_Type;
 }
 
 float p2Body::GetMass() const
 {
-	return mass;
+	return m_Mass;
 }
 
 p2AABB p2Body::GetAABB() const
 {
-	return aabb;
+	return m_Aabb;
 }
 
 std::vector<p2Collider> p2Body::GetColliders() const

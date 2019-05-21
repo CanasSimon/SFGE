@@ -39,15 +39,15 @@ TEST(Physics, TestSAT)
 		{"sensor", true}
 	};
 
-	json colliderShape2 =
+	/*json colliderShape2 =
 	{
 		{"name", "Rect Collider"},
 		{"type", sfge::ComponentType::COLLIDER2D},
 		{"collider_type", sfge::ColliderType::BOX},
 		{"size", {100, 100}},
-		{"offset", {10, 10}},
+		{"offset", {100, 100}},
 		{"sensor", true}
-	};
+	};*/
 
 	for (int i = 0; i < entitiesNmb; i++)
 	{
@@ -63,23 +63,20 @@ TEST(Physics, TestSAT)
 		{
 			{"name", "Rigidbody"},
 			{"type", sfge::ComponentType::BODY2D},
-			{"body_type",  p2BodyType::DYNAMIC},
-			{"max_colliders",  1}
+			{"body_type", p2BodyType::DYNAMIC},
+			{"max_colliders", 2}
 		};
 
-		entityJson["components"] = { transformJson, shape, rigidbody, colliderShape1, colliderShape2 };
+		entityJson["components"] = {transformJson, shape, rigidbody, colliderShape1};
 	}
 
 	sceneJson["entities"] = entities;
 	sceneJson["systems"] = json::array({
 			{
-				{"systemClassName", "DrawAABB"}
+				{"systemClassName", "Debug"}
 			},
 			{
 				{"systemClassName", "BodyTest"}
-			},
-			{
-				{"systemClassName", "DrawSAT"}
 			}
 		}
 	);

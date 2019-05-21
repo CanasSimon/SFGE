@@ -61,13 +61,16 @@ public:
 	* Return a list of all the p2Body that might collide
 	*/
 	void Retrieve();
-	
+
+	void SetBounds(p2AABB bounds);
+	p2AABB GetBounds() const;
+	std::vector<p2QuadTree*> GetChildren() const;
 private:
-	static const int MAX_OBJECTS = 10;
+	static const int MAX_OBJECTS = 1;
 	static const int MAX_LEVELS = 5;
-	static const int CHILD_TREE_NMB = 4;
+	static const int MAX_CHILD_TREE_NMB = 4;
 	int m_NodeLevel = 0;
-	p2QuadTree* nodes[CHILD_TREE_NMB] = { nullptr };
+	std::vector<p2QuadTree*> m_Children = { nullptr };
 	std::list<p2Body*> m_Objects;
 	p2AABB m_Bounds;
 };
