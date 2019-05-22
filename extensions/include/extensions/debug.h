@@ -46,6 +46,7 @@ namespace sfge::ext
 		void DrawAABBShape(p2AABB aabb, sf::Color color) const;
 		void DrawSATShape(p2Collider collider) const;
 
+		p2QuadTree* m_QuadTree;
 		std::vector<p2Vec2> axes;
 
 		sf::Vector2f screenSize;

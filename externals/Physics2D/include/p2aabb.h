@@ -43,5 +43,7 @@ struct p2AABB
 
 	p2Vec2 GetCenter() const;
 	p2Vec2 GetExtends() const;
+	bool DoContain(p2AABB aabb) const;
+	bool DoContain(p2Vec2 position) const;
 };
 #endif // !SFGE_P2AABB:H

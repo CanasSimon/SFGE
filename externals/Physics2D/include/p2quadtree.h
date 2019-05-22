@@ -49,6 +49,8 @@ public:
 	*/
 	void Split();
 
+	void Update();
+
 	/**
 	* Get the index of the child trees of the p2Body
 	*/
@@ -65,6 +67,7 @@ public:
 	void SetBounds(p2AABB bounds);
 	p2AABB GetBounds() const;
 	std::vector<p2QuadTree*> GetChildren() const;
+	std::list<p2Body*> GetObjects() const;
 private:
 	static const int MAX_OBJECTS = 1;
 	static const int MAX_LEVELS = 5;

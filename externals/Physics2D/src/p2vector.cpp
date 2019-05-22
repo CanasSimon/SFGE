@@ -96,7 +96,7 @@ p2Vec2& p2Vec2::operator+=(const p2Vec2& v)
 
 p2Vec2 p2Vec2::operator-(const p2Vec2& v) const
 {
-	return {x-v.x, y-v.y};
+	return {x - v.x, y - v.y};
 }
 
 p2Vec2& p2Vec2::operator-=(const p2Vec2& v)
@@ -115,17 +115,22 @@ p2Vec2& p2Vec2::operator*=(float f)
 
 p2Vec2 p2Vec2::operator/(float f) const
 {
-	return {x/f, y/f};
+	return {x / f, y / f};
+}
+
+p2Vec2 p2Vec2::operator/(const p2Vec2& v) const
+{
+	return {x / v.x, y / v.y};
 }
 
 p2Vec2 p2Vec2::operator*(float f) const
 {
-	return {x*f, y*f};
+	return {x * f, y * f};
 }
 
 p2Vec2 p2Vec2::operator*(const p2Vec2& v) const
 {
-	return { x * v.x, y * v.y };
+	return {x * v.x, y * v.y};
 }
 
 float p2Vec2::Dot(p2Vec2 v1, p2Vec2 v2)
@@ -133,10 +138,12 @@ float p2Vec2::Dot(p2Vec2 v1, p2Vec2 v2)
 	//TODO
 	return (v1.x * v2.x) + (v1.y * v2.y);
 }
+
 float p2Vec2::Cross(p2Vec2 v1, p2Vec2 v2)
 {
 	return (v1.x * v2.y) - (v2.x * v2.y);
 }
+
 float p2Vec2::GetMagnitude() const
 {
 	//TODO
@@ -193,7 +200,7 @@ void p2Vec2::ProjectOn(const p2Vec2& v1)
 p2Vec2 p2Vec2::GetProjectionOn(const p2Vec2& v1) const
 {
 	const float dot = Dot(*this, v1);
-	return { dot / pow(v1.GetMagnitude(), 2) * v1.x, dot / pow(v1.GetMagnitude(), 2) * v1.y };
+	return {dot / pow(v1.GetMagnitude(), 2) * v1.x, dot / pow(v1.GetMagnitude(), 2) * v1.y};
 }
 
 p2Vec2 p2Vec2::GetNormal() const
@@ -210,7 +217,7 @@ p2Vec2 p2Vec2::GetReflection(const p2Vec2& n) const
 
 bool p2Vec2::OnSegment(const p2Vec2& v1, const p2Vec2& v2) const
 {
-	return v1.x <= std::max(x, v2.x) && v1.x >= std::min(x, v2.x) && 
+	return v1.x <= std::max(x, v2.x) && v1.x >= std::min(x, v2.x) &&
 		v1.y <= std::max(y, v2.y) && v1.y >= std::min(y, v2.y);
 }
 
@@ -242,7 +249,7 @@ p2Vec3::p2Vec3(float x, float y, float z)
 	this->z = z;
 }
 
-p2Vec3 p2Vec3::operator+(const p2Vec3& v)const
+p2Vec3 p2Vec3::operator+(const p2Vec3& v) const
 {
 	return {x + v.x, y + v.y, z + v.z};
 }
@@ -257,7 +264,7 @@ p2Vec3& p2Vec3::operator+=(const p2Vec3& v)
 
 p2Vec3 p2Vec3::operator-(const p2Vec3& v) const
 {
-	return {x - v.x, y - v.y, z- v.z};
+	return {x - v.x, y - v.y, z - v.z};
 }
 
 p2Vec3& p2Vec3::operator-=(const p2Vec3& v)
@@ -278,12 +285,12 @@ p2Vec3& p2Vec3::operator*=(float f)
 
 p2Vec3 p2Vec3::operator/(float f) const
 {
-	return {x / f, y / f, z/f};
+	return {x / f, y / f, z / f};
 }
 
 p2Vec3 p2Vec3::operator*(float f) const
 {
-	return {x*f, y*f, z*f};
+	return {x * f, y * f, z * f};
 }
 
 float p2Vec3::Dot(p2Vec3 v1, p2Vec3 v2)

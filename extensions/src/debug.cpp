@@ -25,6 +25,8 @@ namespace sfge::ext
 		m_InputManager = m_Engine.GetInputManager();
 		m_KeyboardManager = &m_InputManager->GetKeyboardManager();
 
+		m_QuadTree = m_World->GetQuadTree();
+
 		auto* entityManager = m_Engine.GetEntityManager();
 
 		const auto config = m_Engine.GetConfig();
@@ -44,7 +46,7 @@ namespace sfge::ext
 		quadTreeBounds.topLeft = p2Vec2(0, pixel2meter(screenSize).y);
 		quadTreeBounds.topRight = pixel2meter(screenSize);
 		quadTreeBounds.bottomRight = p2Vec2(pixel2meter(screenSize).x, 0);
-		m_World->GetQuadTree()->SetBounds(quadTreeBounds);
+		m_QuadTree->SetBounds(quadTreeBounds);
 	}
 
 	void Debug::OnUpdate(float dt)
@@ -101,13 +103,14 @@ namespace sfge::ext
 			}
 		}
 
-		if (drawSat || drawAabb)
+		if (drawSat || drawAabb || drawQuadTree)
 		{
-			if (drawAabb)
+			if (drawQuadTree)
 			{
-				DrawAABBShape(m_World->GetQuadTree()->GetBounds(), sf::Color::Red);
-				for (auto& child : m_World->GetQuadTree()->GetChildren())
+				DrawAABBShape(m_QuadTree->GetBounds(), sf::Color::Red);
+				for (auto& child : m_QuadTree->GetChildren())
 				{
+					if(child == nullptr) break;
 					DrawAABBShape(child->GetBounds(), sf::Color::Red);
 				}
 			}
@@ -146,6 +149,7 @@ namespace sfge::ext
 		{
 			for (auto& axis : axes)
 			{
+				m_Graphics2DManager->DrawVector(meter2pixel(axis), meter2pixel(axis * 5));
 				for (auto& vertex : aabb.vertices)
 				{
 					m_Graphics2DManager->DrawLine(meter2pixel(aabb.GetCenter()), meter2pixel(vertex.GetProjectionOn(axis)),
@@ -162,7 +166,7 @@ namespace sfge::ext
 
 		const auto offset = p2Vec2(1, 1);
 		const auto temp1 = p2Vec2(4, 4);
-		const auto temp2 = p2Vec2(5.1, 5.1);
+		const auto temp2 = p2Vec2(4.9, 4.9);
 		const auto vector1 = p2Vec2().GetVectorFrom(temp1, temp1 + offset);
 		const auto vector2 = p2Vec2().GetVectorFrom(temp2, temp2 + offset);
 		m_Graphics2DManager->DrawLine(meter2pixel(temp1), meter2pixel(temp1 + offset), sf::Color::Magenta);

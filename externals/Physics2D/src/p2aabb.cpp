@@ -33,3 +33,13 @@ p2Vec2 p2AABB::GetExtends() const
 {
 	return { topRight.x - bottomLeft.x, topRight.y - bottomLeft.y};
 }
+
+bool p2AABB::DoContain(const p2AABB aabb) const
+{
+	return aabb.bottomLeft > bottomLeft && aabb.topRight < topRight;
+}
+
+bool p2AABB::DoContain(const p2Vec2 position) const
+{
+	return position > bottomLeft && position < topRight;
+}

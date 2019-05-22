@@ -35,28 +35,21 @@ p2World::p2World(p2Vec2 gravity): m_Gravity(gravity)
 	m_QuadTreeBounds.bottomRight = p2Vec2(1, 0);
 
 	m_QuadTree = new p2QuadTree(0, m_QuadTreeBounds);
-	for (auto& body : m_Bodies)
-	{
-		m_QuadTree->Insert(&body);
-	}
 }
 
 void p2World::Step(float dt)
 {
-	for (p2Body& body : m_Bodies)
+	for (auto& body : m_Bodies)
 	{
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
+			m_QuadTree->Insert(&body);
 			body.ApplyForceToCenter(m_Gravity * dt);
 			body.Offset(body.GetLinearVelocity() * dt);
 		}
 	}
 
-
-	for (auto& child : m_QuadTree->GetChildren())
-	{
-
-	}
+	m_QuadTree->Update();
 
 	// TODO Check for collision
 }

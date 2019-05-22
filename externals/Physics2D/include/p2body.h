@@ -91,7 +91,7 @@ private:
 	p2Vec2 m_LinearVelocity;
 	float m_AngularVelocity = 0;
 	float m_Mass = 1;
-	p2BodyType m_Type = p2BodyType::DYNAMIC;
+	p2BodyType m_Type = p2BodyType::STATIC;
 
 	size_t m_MaxColliderCount = 4;
 	int m_ColliderIndex = 0;

@@ -291,13 +291,10 @@ TEST(Physics, TestShapeContactCpp)
 	sceneJson["entities"] = entities;
 	sceneJson["systems"] = json::array({
 			{
-				{"systemClassName", "DrawAABB"}
+				{"systemClassName", "Debug"}
 			},
 			{
 				{"systemClassName", "BodyTest"}
-			},
-			{
-				{"systemClassName", "DrawSAT"}
 			}
 		}
 	);
