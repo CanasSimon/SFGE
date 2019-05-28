@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef SFGE_P2WORLD_H
-#define SFGE_P2WORLD_H
+#ifndef SFGE_P2_WORLD_H
+#define SFGE_P2_WORLD_H
 
 #include <p2vector.h>
 #include <p2body.h>
@@ -38,7 +38,7 @@ const size_t MAX_BODY_LEN = 256;
 class p2World
 {
 public:
-	p2World(p2Vec2 gravity);
+	p2World(const p2Vec2& gravity);
 	/**
 	* \brief Simulate a new step of the physical world, simplify the resolution with a QuadTree, generate the new contacts
 	*/
@@ -50,13 +50,13 @@ public:
 	/**
 	* \brief Set the contact listener
 	*/
-	void SetContactListener(p2ContactListener* contactListener);
+	static void SetContactListener(p2ContactListener* contactListener);
 
 	p2QuadTree * GetQuadTree() const;
 private:
 
 	p2Vec2 m_Gravity;
-	p2AABB m_QuadTreeBounds;
+	p2Aabb m_QuadTreeBounds;
 	p2QuadTree* m_QuadTree;
 	std::vector<p2Body> m_Bodies;
 	int m_BodyIndex = 0;

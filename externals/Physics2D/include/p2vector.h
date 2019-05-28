@@ -22,14 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef SFGE_P2VECTOR_H
-#define SFGE_P2VECTOR_H
+#ifndef SFGE_P2_VECTOR_H
+#define SFGE_P2_VECTOR_H
 
 struct p2Vec3;
 
 struct p2Vec2
 {
-	virtual ~p2Vec2() = default;
 	p2Vec2();
 
 	p2Vec2(float x, float y);
@@ -70,10 +69,17 @@ struct p2Vec2
 	bool OnSegment(const p2Vec2& v1, const p2Vec2& v2) const;
 	static bool DoOverlap(const p2Vec2& v1, const p2Vec2& v2, const p2Vec2& w1, const p2Vec2& w2);
 
-	p2Vec3 to3() const;
+	p2Vec3 To3() const;
 
 	float x = 0.0f;
 	float y = 0.0f;
+
+	static const p2Vec2 ZERO;
+	static const p2Vec2 ONE;
+	static const p2Vec2 UP;
+	static const p2Vec2 DOWN;
+	static const p2Vec2 RIGHT;
+	static const p2Vec2 LEFT;
 };
 
 struct p2Vec3
@@ -97,7 +103,7 @@ struct p2Vec3
 	* \brief Cross product of two vectors
 	*/
 	static p2Vec3 Cross(p2Vec3 v1, p2Vec3 v2);
-	p2Vec3 Rotate(float angle) const;
+	static p2Vec3 Rotate(float angle);
 	static p2Vec3 Lerp(const p2Vec3& v1, const p2Vec3& v2, float t);
 	static float AngleBetween(const p2Vec3& v1, const p2Vec3& v2);
 	/**

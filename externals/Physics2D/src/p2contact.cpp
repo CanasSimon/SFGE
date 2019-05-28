@@ -33,3 +33,11 @@ p2Collider * p2Contact::GetColliderB()
 {
 	return nullptr;
 }
+
+void p2ContactListener::BeginContact(p2Contact* contact)
+{
+}
+
+void p2ContactListener::EndContact(p2Contact* contact)
+{
+}

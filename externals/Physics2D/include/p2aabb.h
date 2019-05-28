@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef SFGE_P2AABB_H
-#define SFGE_P2AABB_H
+#ifndef SFGE_P2_AABB_H
+#define SFGE_P2_AABB_H
 
 #include <p2vector.h>
 #include <vector>
@@ -31,11 +31,9 @@ SOFTWARE.
 /**
 * \brief Struct representing a Axis Aligned Bounding Box
 */
-struct p2AABB
+struct p2Aabb
 {
 	p2Vec2 topRight = { 0, 0 };
-	p2Vec2 topLeft = {0, 0};
-	p2Vec2 bottomRight = { 0, 0 };
 	p2Vec2 bottomLeft = { 0, 0 };
 
 	std::vector<p2Vec2> vertices;
@@ -43,7 +41,8 @@ struct p2AABB
 
 	p2Vec2 GetCenter() const;
 	p2Vec2 GetExtends() const;
-	bool DoContain(p2AABB aabb) const;
+	bool DoContain(p2Aabb aabb) const;
 	bool DoContain(p2Vec2 position) const;
+	bool DoOverlapWith(p2Aabb aabb) const;
 };
 #endif // !SFGE_P2AABB:H

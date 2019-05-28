@@ -22,12 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef SFGE_P2QUADTREE_H
-#define SFGE_P2QUADTREE_H
+#ifndef SFGE_P2_QUADTREE_H
+#define SFGE_P2_QUADTREE_H
 
 #include <list>
 
-#include <p2vector.h>
 #include <p2aabb.h>
 #include <p2body.h>
 
@@ -37,8 +36,7 @@ SOFTWARE.
 class p2QuadTree
 {
 public:
-	p2QuadTree(int nodeLevel, p2AABB bounds);
-	~p2QuadTree();
+	p2QuadTree(int nodeLevel, p2Aabb bounds);
 
 	/**
 	* Remove all objects leafs and quadtrees children
@@ -48,8 +46,6 @@ public:
 	* Called when node have too much objects and split the current node into four
 	*/
 	void Split();
-
-	void Update();
 
 	/**
 	* Get the index of the child trees of the p2Body
@@ -62,20 +58,20 @@ public:
 	/**
 	* Return a list of all the p2Body that might collide
 	*/
-	void Retrieve();
+	std::list<p2Body*> Retrieve(p2Body* rect);
 
-	void SetBounds(p2AABB bounds);
-	p2AABB GetBounds() const;
+	void SetBounds(p2Aabb bounds);
+	p2Aabb GetBounds() const;
 	std::vector<p2QuadTree*> GetChildren() const;
 	std::list<p2Body*> GetObjects() const;
 private:
-	static const int MAX_OBJECTS = 1;
+	static const int MAX_OBJECTS = 3;
 	static const int MAX_LEVELS = 5;
 	static const int MAX_CHILD_TREE_NMB = 4;
 	int m_NodeLevel = 0;
-	std::vector<p2QuadTree*> m_Children = { nullptr };
+	std::vector<p2QuadTree*> m_Children;
 	std::list<p2Body*> m_Objects;
-	p2AABB m_Bounds;
+	p2Aabb m_Bounds;
 };
 
 #endif

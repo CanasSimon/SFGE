@@ -60,7 +60,7 @@ class p2Body
 {
 public:
 	void Init(p2BodyDef* bodyDef);
-	void RebuildAABB();
+	void RebuildAabb();
 	p2Vec2 GetLinearVelocity() const;
 
 	void SetLinearVelocity(p2Vec2 velocity);
@@ -81,11 +81,11 @@ public:
 	void SetRotation(float rotation);
 	p2BodyType GetType() const;
 	float GetMass() const;
-	p2AABB GetAABB() const;
+	p2Aabb GetAabb() const;
 	std::vector<p2Collider> GetColliders() const;
 private:
-	p2BodyDef m_BodyDefinition;
-	p2AABB m_Aabb;
+	p2BodyDef m_BodyDefinition{};
+	p2Aabb m_Aabb;
 	p2Vec2 m_Position;
 	float m_Rotation = 0;
 	p2Vec2 m_LinearVelocity;

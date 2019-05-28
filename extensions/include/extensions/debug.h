@@ -22,7 +22,7 @@ namespace sfge::ext
 	class Debug : public System
 	{
 	public:
-		Debug(Engine& engine);
+		explicit Debug(Engine& engine);
 
 		void OnEngineInit() override;
 
@@ -32,6 +32,7 @@ namespace sfge::ext
 
 		void OnDraw() override;
 
+		std::vector<p2Vec2> m_Contacts;
 	private:
 		Physics2dManager* m_PhysicsManager;
 		p2World* m_World;
@@ -43,20 +44,21 @@ namespace sfge::ext
 		InputManager* m_InputManager;
 		KeyboardManager* m_KeyboardManager;
 
-		void DrawAABBShape(p2AABB aabb, sf::Color color) const;
-		void DrawSATShape(p2Collider collider) const;
+		void DrawAabb(p2Aabb aabb, sf::Color color) const;
+		void DrawSat(const p2Body* body1, const p2Body* body2) const;
+		void DrawQuadTree(p2QuadTree * quadTree, sf::Color color) const;
 
 		p2QuadTree* m_QuadTree;
-		std::vector<p2Vec2> axes;
+		std::vector<p2Vec2> m_Axes;
 
-		sf::Vector2f screenSize;
-		std::vector<Transform2d*> transforms;
-		std::vector<p2Body*> bodies;
-		std::vector<Entity> entities;
+		sf::Vector2f m_ScreenSize;
+		std::vector<Transform2d*> m_Transforms;
+		std::vector<p2Body*> m_Bodies;
+		std::vector<Entity> m_Entities;
 
-		bool drawAabb = false;
-		bool drawSat = false;
-		bool drawQuadTree = false;
+		bool m_DrawAabb = false;
+		bool m_DrawSat = false;
+		bool m_DrawQuadTree = false;
 	};
 }
 

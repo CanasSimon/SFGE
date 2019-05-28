@@ -24,7 +24,6 @@ SOFTWARE.
 
 #include <p2vector.h>
 #include <cmath>
-#include "engine/vector.h"
 #include <corecrt_math_defines.h>
 #include <cstdlib>
 #include <algorithm>
@@ -35,13 +34,20 @@ SOFTWARE.
  * p2Vec2 operations *
  *********************/
 
+const p2Vec2 p2Vec2::ZERO(0, 0);
+const p2Vec2 p2Vec2::ONE(1, 1);
+const p2Vec2 p2Vec2::UP(0, 1);
+const p2Vec2 p2Vec2::DOWN(0, -1);
+const p2Vec2 p2Vec2::RIGHT(1, 0);
+const p2Vec2 p2Vec2::LEFT(-1, 0);
+
 p2Vec2::p2Vec2()
 {
 	x = 0.0f;
 	y = 0.0f;
 }
 
-p2Vec2::p2Vec2(float x, float y)
+p2Vec2::p2Vec2(const float x, const float y)
 {
 	this->x = x;
 	this->y = y;
@@ -133,32 +139,30 @@ p2Vec2 p2Vec2::operator*(const p2Vec2& v) const
 	return {x * v.x, y * v.y};
 }
 
-float p2Vec2::Dot(p2Vec2 v1, p2Vec2 v2)
+float p2Vec2::Dot(const p2Vec2 v1, const p2Vec2 v2)
 {
-	//TODO
-	return (v1.x * v2.x) + (v1.y * v2.y);
+	return v1.x * v2.x + v1.y * v2.y;
 }
 
-float p2Vec2::Cross(p2Vec2 v1, p2Vec2 v2)
+float p2Vec2::Cross(const p2Vec2 v1, const p2Vec2 v2)
 {
 	return (v1.x * v2.y) - (v2.x * v2.y);
 }
 
 float p2Vec2::GetMagnitude() const
 {
-	//TODO
 	return sqrt(pow(x, 2) + pow(y, 2));
 }
 
 p2Vec2 p2Vec2::Normalized() const
 {
-	const float magnitude = GetMagnitude();
+	const auto magnitude = GetMagnitude();
 	return {x / magnitude, y / magnitude};
 }
 
 void p2Vec2::NormalizeSelf()
 {
-	const float magnitude = GetMagnitude();
+	const auto magnitude = GetMagnitude();
 
 	x = x / magnitude;
 	y = y / magnitude;
@@ -192,14 +196,14 @@ p2Vec2 p2Vec2::GetVectorFrom(const p2Vec2& v1, const p2Vec2& v2)
 
 void p2Vec2::ProjectOn(const p2Vec2& v1)
 {
-	const float dot = Dot(*this, v1);
+	const auto dot = Dot(*this, v1);
 	x = dot / pow(v1.GetMagnitude(), 2) * v1.x;
 	y = dot / pow(v1.GetMagnitude(), 2) * v1.y;
 }
 
 p2Vec2 p2Vec2::GetProjectionOn(const p2Vec2& v1) const
 {
-	const float dot = Dot(*this, v1);
+	const auto dot = Dot(*this, v1);
 	return {dot / pow(v1.GetMagnitude(), 2) * v1.x, dot / pow(v1.GetMagnitude(), 2) * v1.y};
 }
 
@@ -210,8 +214,7 @@ p2Vec2 p2Vec2::GetNormal() const
 
 p2Vec2 p2Vec2::GetReflection(const p2Vec2& n) const
 {
-	p2Vec2 nor = n.GetNormal().Normalized();
-	const float dot = Dot(*this, nor);
+	const auto nor = n.GetNormal().Normalized();
 	return *this - nor * 2 * Dot(*this, nor);
 }
 
@@ -223,14 +226,17 @@ bool p2Vec2::OnSegment(const p2Vec2& v1, const p2Vec2& v2) const
 
 bool p2Vec2::DoOverlap(const p2Vec2& v1, const p2Vec2& v2, const p2Vec2& w1, const p2Vec2& w2)
 {
-	return v1.OnSegment(w1, v2) || v1.OnSegment(w2, v2) || w1.OnSegment(v1, w2) || w1.OnSegment(v2, w2);
+	const auto len1 = GetVectorFrom(v1, v2).GetMagnitude();
+	const auto len2 = GetVectorFrom(w1, w2).GetMagnitude();
+	const auto dif = GetVectorFrom((v1 + v2) / 2, (v1 + v2) / 2).GetMagnitude();
+	return (len1 + len2) / 2 >= dif;
 }
 
 /*********************
  * p2Vec3 operations *
  *********************/
 
-p2Vec3 p2Vec2::to3() const
+p2Vec3 p2Vec2::To3() const
 {
 	return {x, y, 0.0f};
 }
@@ -305,9 +311,9 @@ p2Vec3 p2Vec3::Cross(p2Vec3 v1, p2Vec3 v2)
 	return {v1.y * v2.z - v2.y * v1.z, v1.z * v2.x - v2.z * v1.x, v1.x * v2.y - v2.x * v1.y};
 }
 
-p2Vec3 p2Vec3::Rotate(float angle) const
+p2Vec3 p2Vec3::Rotate(float angle)
 {
-	return p2Vec3();
+	return {};
 }
 
 p2Vec3 p2Vec3::Lerp(const p2Vec3& v1, const p2Vec3& v2, float t)

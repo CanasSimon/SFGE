@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef SFGE_P2SHAPE_H
-#define SFGE_P2SHAPE_H
+#ifndef SFGE_P2_SHAPE_H
+#define SFGE_P2_SHAPE_H
 
 #include <p2vector.h>
 #include <vector>

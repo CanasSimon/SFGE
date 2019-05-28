@@ -48,27 +48,27 @@ p2Vec2 Body2d::GetLinearVelocity() const
 	return p2Vec2();
 }
 
-void Body2d::SetLinearVelocity(p2Vec2 velocity)
+void Body2d::SetLinearVelocity(p2Vec2 velocity) const
 {
 	if (m_Body != nullptr)
 		m_Body->SetLinearVelocity(velocity);
 
 }
 
-void Body2d::ApplyForce(p2Vec2 force)
+void Body2d::ApplyForce(p2Vec2 force) const
 {
 	if (m_Body != nullptr)
 		m_Body->ApplyForceToCenter(force);
 }
 
-p2BodyType Body2d::GetType()
+p2BodyType Body2d::GetType() const
 {
 	if(m_Body != nullptr)
 		return m_Body->GetType();
 	return p2BodyType::STATIC;
 }
 
-float Body2d::GetMass()
+float Body2d::GetMass() const
 {
 	if (m_Body)
 		return m_Body->GetMass();
@@ -167,7 +167,6 @@ void Body2dManager::OnFixedUpdate()
 			m_ComponentsInfo[i].AddVelocity(body2d.GetLinearVelocity());
 			transform.Position = meter2pixel(body2d.GetBody()->GetPosition()) - static_cast<sf::Vector2f>(body2d.GetOffset());
 			body2d.GetBody()->SetRotation(transform.EulerAngle);
-			body2d.GetBody()->RebuildAABB();
 		}
 	}
 }

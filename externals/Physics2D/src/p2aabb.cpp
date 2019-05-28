@@ -24,22 +24,32 @@ SOFTWARE.
 
 #include <p2aabb.h>
 
-p2Vec2 p2AABB::GetCenter() const
+p2Vec2 p2Aabb::GetCenter() const
 {
 	return { (topRight + bottomLeft) / 2 };
 }
 
-p2Vec2 p2AABB::GetExtends() const
+p2Vec2 p2Aabb::GetExtends() const
 {
 	return { topRight.x - bottomLeft.x, topRight.y - bottomLeft.y};
 }
 
-bool p2AABB::DoContain(const p2AABB aabb) const
+bool p2Aabb::DoContain(const p2Aabb aabb) const
 {
 	return aabb.bottomLeft > bottomLeft && aabb.topRight < topRight;
 }
 
-bool p2AABB::DoContain(const p2Vec2 position) const
+bool p2Aabb::DoContain(const p2Vec2 position) const
 {
 	return position > bottomLeft && position < topRight;
+}
+
+bool p2Aabb::DoOverlapWith(p2Aabb aabb) const
+{
+	for (auto& vertex : aabb.vertices)
+	{
+		if (DoContain(vertex)) return true;
+	}
+
+	return false;
 }

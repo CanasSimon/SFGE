@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include <p2shape.h>
+#include <utility>
 
 p2CircleShape::p2CircleShape(float radius) : p2Shape()
 {
@@ -67,12 +68,12 @@ p2PolygonShape::p2PolygonShape() : p2Shape()
 p2PolygonShape::p2PolygonShape(std::vector<p2Vec2> points) : p2Shape()
 {
 	type = POLY;
-	m_Points = points;
+	m_Points = std::move(points);
 }
 
 void p2PolygonShape::SetPoints(std::vector<p2Vec2> points)
 {
-	m_Points = points;
+	m_Points = std::move(points);
 }
 
 std::vector<p2Vec2> p2PolygonShape::GetPoints() const

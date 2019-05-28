@@ -23,8 +23,8 @@ SOFTWARE.
 */
 
 
-#ifndef SFGE_P2COLLIDER_H
-#define SFGE_P2COLLIDER_H
+#ifndef SFGE_P2_COLLIDER_H
+#define SFGE_P2_COLLIDER_H
 
 #include <p2shape.h>
 #include <p2aabb.h>
@@ -42,13 +42,13 @@ enum class p2ColliderType
 */
 struct p2ColliderDef
 {
-	void* userData;
-	p2Shape* shape;
+	void* userData = nullptr;
+	p2Shape* shape{};
 	p2Vec2 position;
 	p2Vec2 offset = { 0, 0 };
-	float restitution;
+	float restitution = 1;
 	bool isSensor = false;
-	p2ColliderType colliderType;
+	p2ColliderType colliderType = p2ColliderType::NONE;
 };
 
 /**
@@ -59,24 +59,23 @@ class p2Collider
 {
 public:
 	void Init(p2ColliderDef* colliderDef);
-	void RebuildAABB(const p2Vec2& bodyPos, float bodyRot);
+	void RebuildAabb(const p2Vec2& bodyPos, float bodyRot);
 	p2Collider();
-	p2Collider(p2ColliderDef colDef);
 	bool IsSensor() const;
 	void* GetUserData() const;
 	p2Shape* GetShape() const;
 	p2ColliderType GetType() const;
 	void SetUserData(void* colliderData);
 	p2Vec2 GetHalfExtend() const;
-	p2AABB GetAABB() const;
+	p2Aabb GetAabb() const;
 
 	p2Vec2 position;
 	p2Vec2 offset = {0, 0};
 private:
-	p2AABB m_Aabb;
+	p2Aabb m_Aabb;
 	void* m_UserData = nullptr;
 	p2Shape* m_Shape{};
-	p2ColliderType m_ColliderType;
+	p2ColliderType m_ColliderType = p2ColliderType::NONE;
 	p2ColliderDef m_ColliderDefinition;
 	p2Vec2 m_HalfExtend = p2Vec2(0, 0);
 };

@@ -4,14 +4,14 @@
 #include <graphics/graphics2d.h>
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
-#include <iostream>
 
 
 namespace sfge::ext
 {
 
 	Debug::Debug(Engine& engine) :
-		System(engine), m_Body2DManager(), m_Graphics2DManager()
+		System(engine), m_PhysicsManager(), m_World(), m_Transform2DManager(), m_Body2DManager(),
+		m_Graphics2DManager(), m_InputManager(), m_KeyboardManager(), m_QuadTree()
 	{
 	}
 
@@ -30,48 +30,53 @@ namespace sfge::ext
 		auto* entityManager = m_Engine.GetEntityManager();
 
 		const auto config = m_Engine.GetConfig();
-		screenSize = sf::Vector2f(config->screenResolution.x, config->screenResolution.y);
+		m_ScreenSize = sf::Vector2f(config->screenResolution.x, config->screenResolution.y);
 
-		entities = entityManager->GetEntitiesWithType(ComponentType::BODY2D);
-		for (auto& entity : entities)
+		m_Entities = entityManager->GetEntitiesWithType(ComponentType::BODY2D);
+		for (auto& entity : m_Entities)
 		{
 			const auto transform = m_Transform2DManager->GetComponentPtr(entity);
 			const auto body = m_Body2DManager->GetComponentPtr(entity);
-			bodies.push_back(body->GetBody());
-			transforms.push_back(transform);
+			m_Bodies.push_back(body->GetBody());
+			m_Transforms.push_back(transform);
 		}
 
-		p2AABB quadTreeBounds;
+		p2Aabb quadTreeBounds;
 		quadTreeBounds.bottomLeft = p2Vec2(0, 0);
-		quadTreeBounds.topLeft = p2Vec2(0, pixel2meter(screenSize).y);
-		quadTreeBounds.topRight = pixel2meter(screenSize);
-		quadTreeBounds.bottomRight = p2Vec2(pixel2meter(screenSize).x, 0);
+		quadTreeBounds.topRight = pixel2meter(m_ScreenSize);
 		m_QuadTree->SetBounds(quadTreeBounds);
+
+		m_QuadTree->Split();
 	}
 
 	void Debug::OnUpdate(float dt)
 	{
 		(void)dt;
 
-		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::A)) drawAabb = !drawAabb;
-		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::S)) drawSat = !drawSat;
-		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::Q)) drawQuadTree = !drawQuadTree;
+		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::A)) m_DrawAabb = !m_DrawAabb;
+		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::S)) m_DrawSat = !m_DrawSat;
+		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::Q)) m_DrawQuadTree = !m_DrawQuadTree;
+		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::C)) m_QuadTree->Clear();
 
-		for (auto& body : bodies)
+		for (auto& body : m_Bodies)
 		{
 			const auto velocity = body->GetLinearVelocity();
 
 			for (auto& collider : body->GetColliders())
 			{
-				if (collider.GetAABB().topRight.x > pixel2meter(screenSize).x && velocity.x > 0 || collider.GetAABB().topLeft.x < 0 && velocity.x < 0)
+				for (auto& vertex : collider.GetAabb().vertices)
 				{
-					body->SetLinearVelocity(p2Vec2(-velocity.x, velocity.y));
-					break;
-				}
-				if (collider.GetAABB().topRight.y > pixel2meter(screenSize).y && velocity.y > 0 || collider.GetAABB().bottomRight.y < 0 && velocity.y < 0)
-				{
-					body->SetLinearVelocity(p2Vec2(velocity.x, -velocity.y));
-					break;
+					if(vertex.x > pixel2meter(m_ScreenSize).x && velocity.x > 0 || vertex.x < 0 && velocity.x < 0)
+					{
+						body->SetLinearVelocity(p2Vec2(-velocity.x, velocity.y));
+						break;
+					}
+
+					if (vertex.y > pixel2meter(m_ScreenSize).y && velocity.y > 0 || vertex.y < 0 && velocity.y < 0)
+					{
+						body->SetLinearVelocity(p2Vec2(velocity.x, -velocity.y));
+						break;
+					}
 				}
 			}
 		}
@@ -81,99 +86,135 @@ namespace sfge::ext
 	{
 		rmt_ScopedCPUSample(DrawAABBFixedUpdate, 0);
 
-		transforms[0]->EulerAngle += 1;
+		m_Transforms[0]->EulerAngle += 1;
 	}
 
 	void Debug::OnDraw()
 	{
 		rmt_ScopedCPUSample(DrawAABBDraw, 0);
-		axes.clear();
+		m_Axes.clear();
 
-		if(drawSat)
+		if(m_DrawSat)
 		{
-			for (auto& body : bodies)
+			for (auto& body : m_Bodies)
 			{
 				for (auto& collider : body->GetColliders())
 				{
-					for (auto& edge : collider.GetAABB().edges)
+					for (auto& edge : collider.GetAabb().edges)
 					{
-						axes.push_back(edge.GetNormal());
+						m_Axes.push_back(edge.GetNormal());
 					}
 				}
 			}
 		}
 
-		if (drawSat || drawAabb || drawQuadTree)
-		{
-			if (drawQuadTree)
-			{
-				DrawAABBShape(m_QuadTree->GetBounds(), sf::Color::Red);
-				for (auto& child : m_QuadTree->GetChildren())
-				{
-					if(child == nullptr) break;
-					DrawAABBShape(child->GetBounds(), sf::Color::Red);
-				}
-			}
+		if (m_DrawSat) DrawSat(m_Bodies[0], m_Bodies[1]);
 
-			for (auto& body : bodies)
+		if (m_DrawQuadTree)
+		{
+			DrawQuadTree(m_QuadTree, sf::Color::Red);
+
+			for (auto& bodies : m_QuadTree->Retrieve(m_Bodies[0]))
 			{
-				if (drawAabb) DrawAABBShape(body->GetAABB(), sf::Color::Red);
+				m_Graphics2DManager->DrawLine(meter2pixel(bodies->GetPosition()), Vec2f(0, 0), sf::Color::White);
+			}
+		}
+
+		if (m_DrawSat || m_DrawAabb)
+		{
+			for (auto& body : m_Bodies)
+			{
+				if (m_DrawAabb) DrawAabb(body->GetAabb(), sf::Color::Red);
 				for (auto& collider : body->GetColliders())
 				{
-					if (drawAabb) DrawAABBShape(collider.GetAABB(), sf::Color::Green);
-					if (drawSat) DrawSATShape(collider);
+					if (m_DrawAabb) DrawAabb(collider.GetAabb(), sf::Color::Green);
 				}
 			}
 		}
 	}
 
-	void Debug::DrawAABBShape(p2AABB aabb, sf::Color color) const
+	void Debug::DrawAabb(const p2Aabb aabb, const sf::Color color) const
 	{
 		//std::cout << m_Aabb.topRight().x << ":" << m_Aabb.topRight().y << "\n";
-		m_Graphics2DManager->DrawLine(meter2pixel(aabb.topRight), meter2pixel(aabb.topLeft), color);
-		m_Graphics2DManager->DrawLine(meter2pixel(aabb.topRight), meter2pixel(aabb.bottomRight), color);
-		m_Graphics2DManager->DrawLine(meter2pixel(aabb.bottomLeft), meter2pixel(aabb.topLeft), color);
-		m_Graphics2DManager->DrawLine(meter2pixel(aabb.bottomLeft), meter2pixel(aabb.bottomRight), color);
+		for (size_t i = 0; i < aabb.vertices.size(); ++i)
+		{
+			m_Graphics2DManager->DrawLine(meter2pixel(aabb.vertices[i]), meter2pixel(aabb.vertices[i + 1 < aabb.vertices.size() ? i + 1 : 0]), color);
+		}
 	}
 
-	void Debug::DrawSATShape(p2Collider collider) const
+	void Debug::DrawSat(const p2Body* bodyA, const p2Body* bodyB) const
 	{
-		const auto aabb = collider.GetAABB();
-		switch (collider.GetType())
+		std::vector<p2Vec2> axes;
+		const auto aabbA = bodyA->GetColliders()[0].GetAabb();
+		const auto aabbB = bodyB->GetColliders()[0].GetAabb();
+		for (auto& edge : aabbA.edges)
 		{
-		case p2ColliderType::CIRCLE:
-			m_Graphics2DManager->DrawLine(meter2pixel(collider.position), meter2pixel(p2Vec2(aabb.topRight.x, 0)),
-				sf::Color::Blue);
-			break;
-		case p2ColliderType::RECT:
+			axes.push_back(edge.GetNormal());
+
+			const auto linePos = aabbA.GetCenter() + edge * 2;
+			m_Graphics2DManager->DrawLine(meter2pixel(linePos + edge.GetNormal() * 500), meter2pixel(linePos - edge.GetNormal() * 500), sf::Color::Blue);
+		}
+
+		for (auto& edge : aabbB.edges)
 		{
-			for (auto& axis : axes)
+			axes.push_back(edge.GetNormal());
+
+			const auto linePos = aabbB.GetCenter() + edge * 2;
+			m_Graphics2DManager->DrawLine(meter2pixel(linePos + edge.GetNormal() * 500), meter2pixel(linePos - edge.GetNormal() * 500), sf::Color::Blue);
+		}
+
+		for (auto& axis : axes)
+		{
+			auto aMaxProj = -std::numeric_limits<float>::infinity();
+			auto aMinProj = std::numeric_limits<float>::infinity();
+			auto bMaxProj = -std::numeric_limits<float>::infinity();
+			auto bMinProj = std::numeric_limits<float>::infinity();
+
+			for (auto& vertex : aabbA.vertices)
 			{
-				m_Graphics2DManager->DrawVector(meter2pixel(axis), meter2pixel(axis * 5));
-				for (auto& vertex : aabb.vertices)
-				{
-					m_Graphics2DManager->DrawLine(meter2pixel(aabb.GetCenter()), meter2pixel(vertex.GetProjectionOn(axis)),
-						sf::Color::Blue);
-					m_Graphics2DManager->DrawVector(meter2pixel(aabb.edges[0]), meter2pixel(vertex));
-				}
+				const auto proj = p2Vec2::Dot(axis, vertex);
+				if (proj < aMinProj) aMinProj = proj;
+				if (proj > aMaxProj) aMaxProj = proj;
+
+				m_Graphics2DManager->DrawLine(meter2pixel(vertex.GetProjectionOn(axis)), meter2pixel(vertex), sf::Color::Magenta);
 			}
 
-		}
-		break;
-		default:
-			break;
+			for (auto& vertex : aabbB.vertices)
+			{
+				const auto proj = p2Vec2::Dot(axis, vertex);
+				if (proj < bMinProj) bMinProj = proj;
+				if (proj > bMaxProj) bMaxProj = proj;
+			}
+
+			if (aMaxProj < bMinProj || bMaxProj < aMinProj)
+			{
+				//return;
+			}
 		}
 
-		const auto offset = p2Vec2(1, 1);
-		const auto temp1 = p2Vec2(4, 4);
-		const auto temp2 = p2Vec2(4.9, 4.9);
-		const auto vector1 = p2Vec2().GetVectorFrom(temp1, temp1 + offset);
-		const auto vector2 = p2Vec2().GetVectorFrom(temp2, temp2 + offset);
-		m_Graphics2DManager->DrawLine(meter2pixel(temp1), meter2pixel(temp1 + offset), sf::Color::Magenta);
-		m_Graphics2DManager->DrawLine(meter2pixel(temp2), meter2pixel(temp2 + offset), sf::Color::Green);
+		/*m_Graphics2DManager->DrawLine(meter2pixel(bodyA->GetPosition()), meter2pixel(bodyB->GetPosition()),
+			sf::Color::Green);*/
+	}
 
-		if (p2Vec2().DoOverlap(temp1, temp1 + offset, temp2, temp2 + offset))
-			m_Graphics2DManager->DrawLine(meter2pixel(temp1 + p2Vec2(1, 1)),
-				meter2pixel(temp2 + p2Vec2(1, 1)), sf::Color::Red);
+	void Debug::DrawQuadTree(p2QuadTree * quadTree, const sf::Color color) const
+	{
+		const auto aabb = quadTree->GetBounds();
+		const auto extend = aabb.GetExtends();
+		m_Graphics2DManager->DrawLine(meter2pixel(aabb.topRight), meter2pixel(p2Vec2(aabb.topRight.x - extend.x, aabb.topRight.y)), color);
+		m_Graphics2DManager->DrawLine(meter2pixel(aabb.topRight), meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y - extend.y)), color);
+		m_Graphics2DManager->DrawLine(meter2pixel(aabb.bottomLeft), meter2pixel(p2Vec2(aabb.topRight.x - extend.x, aabb.topRight.y)), color);
+		m_Graphics2DManager->DrawLine(meter2pixel(aabb.bottomLeft), meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y - extend.y)), color);
+		if(!quadTree->GetChildren().empty())
+		{
+			for (auto& child : quadTree->GetChildren())
+			{
+				DrawQuadTree(child, color);
+			}
+		}
+
+		for (auto& obj : quadTree->GetObjects())
+		{
+			m_Graphics2DManager->DrawLine(meter2pixel(obj->GetPosition()), meter2pixel(aabb.bottomLeft), sf::Color::Green);
+		}
 	}
 }

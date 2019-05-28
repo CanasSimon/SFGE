@@ -27,8 +27,6 @@ SOFTWARE.
 
 #include <extensions/python_extensions.h>
 #include <extensions/planet_system.h>
-#include <extensions/draw_aabb.h>
-#include <extensions/draw_sat.h>
 #include <extensions/debug.h>
 #include <extensions/body_test.h>
 

@@ -24,9 +24,7 @@ SOFTWARE.
 
 #include <p2matrix.h>
 
-p2Mat22::p2Mat22()
-{
-}
+p2Mat22::p2Mat22() = default;
 
 p2Mat22::p2Mat22(p2Vec2 r1, p2Vec2 r2)
 {
@@ -96,9 +94,7 @@ float p2Mat22::GetDeterminant() const
 	return (rows[0].x * rows[1].y) - (rows[0].y * rows[1].x);
 }
 
-p2Mat33::p2Mat33()
-{
-}
+p2Mat33::p2Mat33() = default;
 
 p2Mat33::p2Mat33(p2Vec3 r1, p2Vec3 r2, p2Vec3 r3)
 {
@@ -178,7 +174,7 @@ p2Mat33 p2Mat33::Invert() const
 	minorR3.y = -minorR3.y;
 
 	// Create the 3x3 matrix
-	p2Mat33 result = p2Mat33(minorR1, minorR2, minorR3);
+	auto result = p2Mat33(minorR1, minorR2, minorR3);
 
 	// Transpose the matrix
 	result.rows[0].y = minorR2.x;

@@ -41,10 +41,10 @@ public:
 	Body2d(Transform2d *transform, Vec2f offset);
 
 	p2Vec2 GetLinearVelocity() const;
-	void SetLinearVelocity(p2Vec2 velocity);
-	void ApplyForce(p2Vec2 force);
-	p2BodyType GetType();
-	float GetMass();
+	void SetLinearVelocity(p2Vec2 velocity) const;
+	void ApplyForce(p2Vec2 force) const;
+	p2BodyType GetType() const;
+	float GetMass() const;
 	void SetBody(p2Body* body);
 	p2Body* GetBody() const;
 private:

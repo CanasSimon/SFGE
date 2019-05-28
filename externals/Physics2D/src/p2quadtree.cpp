@@ -1,98 +1,67 @@
-#include "..\include\p2quadtree.h"
+#include <utility>
+#include <p2quadtree.h>
+#include <iostream>
 
-p2QuadTree::p2QuadTree(int nodeLevel, p2AABB bounds)
+p2QuadTree::p2QuadTree(const int nodeLevel, p2Aabb bounds)
 {
-	m_Children.resize(MAX_CHILD_TREE_NMB);
-
 	// Set base values
 	m_NodeLevel = nodeLevel;
-	m_Bounds = bounds;
-}
-
-p2QuadTree::~p2QuadTree()
-{
+	m_Bounds = std::move(bounds);
 }
 
 void p2QuadTree::Clear()
 {
-	for (p2QuadTree* quad : m_Children)
-	{
-		quad->Clear();
-
-		for (p2Body* body : quad->m_Objects)
-		{
-			m_Objects.push_back(body);
-		}
-
-		delete quad;
-	}
+	m_Objects.clear();
+	m_Children.clear();
 }
 
 void p2QuadTree::Split()
 {
 	if (m_NodeLevel > MAX_LEVELS) return;
 
-	// Define the corners of the current node
-	const p2Vec2 extends = m_Bounds.GetExtends();
-
 	// Set the current position
-	p2Vec2 currentPosition = m_Bounds.bottomLeft;
+	auto currentPosition = m_Bounds.bottomLeft;
 
 	// Define the size of the child sides depending on the amount of child tree number
-	const p2Vec2 childSideSize = (m_Bounds.topRight - currentPosition) / sqrt(MAX_CHILD_TREE_NMB);
+	const auto childSize = (m_Bounds.topRight - currentPosition) / sqrt(MAX_CHILD_TREE_NMB);
 
-	for (int i = 0; i < MAX_CHILD_TREE_NMB; i++)
+	for (auto x = 0; x < sqrt(MAX_CHILD_TREE_NMB); ++x)
 	{
-		p2AABB childAABB;
+		for (auto y = 0; y < sqrt(MAX_CHILD_TREE_NMB); ++y)
+		{
+			p2Aabb childAabb;
 
-		childAABB.bottomLeft = currentPosition;
-		childAABB.topLeft = currentPosition + p2Vec2(0, childSideSize.y);
-		childAABB.topRight = currentPosition + childSideSize;
-		childAABB.bottomRight = currentPosition + p2Vec2(childSideSize.x, 0);
+			currentPosition = m_Bounds.bottomLeft + p2Vec2(childSize.x * x, childSize.y * y);
 
-		// Check if it needs to jump on the y axis
-		if (currentPosition.x + childSideSize.x >= extends.x)
-			currentPosition = { m_Bounds.bottomLeft.x, currentPosition.y + childSideSize.y };
-		else
-			currentPosition.x = currentPosition.x + childSideSize.x;
+			childAabb.bottomLeft = currentPosition;
+			childAabb.topRight = currentPosition + childSize;
 
-		// Add the node to the child array
-		m_Children[i] = new p2QuadTree(m_NodeLevel + 1, childAABB);
-	}
-}
-
-void p2QuadTree::Update()
-{
-	if (m_Objects.size() > MAX_OBJECTS) {
-		Split();
-		m_Objects.clear();
+			// Add the node to the child array
+			m_Children.push_back(new p2QuadTree(m_NodeLevel + 1, childAabb));
+		}
 	}
 
-	for (auto& child : m_Children)
+	for (auto& obj : m_Objects)
 	{
-		if (child == nullptr) break;
-		child->Update();
+		for (auto* child : m_Children)
+		{
+			if (child->m_Bounds.DoOverlapWith(obj->GetAabb())) child->Insert(obj);
+		}
 	}
+
+	m_Objects.clear();
 }
 
 int p2QuadTree::GetIndex(p2Body * rect)
 {
-	for (int i = 0; i < m_Objects.size(); ++i)
+	for (auto& body : m_Objects)
 	{
-		for (auto& body : m_Objects)
-		{
-			if (body == rect)
-				return i;
-		}
+		if (body == rect) return m_NodeLevel;
 	}
 
-	for (int i = 0; i < MAX_CHILD_TREE_NMB; i++)
+	for (auto& child : m_Children)
 	{
-		for(auto& body : m_Children[i]->m_Objects)
-		{
-			if (body == rect)
-				return i;
-		}
+		child->GetIndex(rect);
 	}
 
 	return 0;
@@ -100,30 +69,50 @@ int p2QuadTree::GetIndex(p2Body * rect)
 
 void p2QuadTree::Insert(p2Body * obj)
 {
-	const auto objAABB = obj->GetAABB();
-	for (auto& child : m_Children)
+	if (!m_Children.empty())
 	{
-		if (child == nullptr) {
-			m_Objects.push_back(obj);
-			break;
+		for (auto* child : m_Children)
+		{
+			if (child->m_Bounds.DoOverlapWith(obj->GetAabb())) child->Insert(obj);
 		}
+	}
+	else 
+	{
+		m_Objects.push_back(obj);
+	}
 
-		//if(child->m_Bounds.DoContain(objAABB)) child->Insert(obj);
-		if (child->m_Bounds.DoContain(obj->GetPosition())) child->Insert(obj);
+	if (m_Objects.size() > MAX_OBJECTS) {
+		Split();
 	}
 }
 
-void p2QuadTree::Retrieve()
+std::list<p2Body*> p2QuadTree::Retrieve(p2Body* rect)
 {
+	std::list<p2Body*> returnValue;
+	for (auto& body : m_Objects)
+	{
+		if (body == rect) returnValue = m_Objects;
+	}
 
+	for (auto& child : m_Children)
+	{
+		const auto retrieve = child->Retrieve(rect);
+		if(!retrieve.empty())
+		{
+			returnValue = retrieve;
+			break;
+		}
+	}
+
+	return returnValue;
 }
 
-void p2QuadTree::SetBounds(p2AABB bounds)
+void p2QuadTree::SetBounds(p2Aabb bounds)
 {
-	m_Bounds = bounds;
+	m_Bounds = std::move(bounds);
 }
 
-p2AABB p2QuadTree::GetBounds() const
+p2Aabb p2QuadTree::GetBounds() const
 {
 	return m_Bounds;
 }

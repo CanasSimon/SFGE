@@ -23,33 +23,35 @@ SOFTWARE.
 */
 #include <p2world.h>
 #include <p2quadtree.h>
+#include <iostream>
 
 
-p2World::p2World(p2Vec2 gravity): m_Gravity(gravity)
+p2World::p2World(const p2Vec2& gravity): m_Gravity(gravity)
 {
 	m_Bodies.resize(MAX_BODY_LEN);
 
 	m_QuadTreeBounds.bottomLeft = p2Vec2(0, 0);
-	m_QuadTreeBounds.topLeft = p2Vec2(0, 1);
 	m_QuadTreeBounds.topRight = p2Vec2(1, 1);
-	m_QuadTreeBounds.bottomRight = p2Vec2(1, 0);
 
 	m_QuadTree = new p2QuadTree(0, m_QuadTreeBounds);
 }
 
-void p2World::Step(float dt)
+void p2World::Step(const float dt)
 {
+	m_QuadTree->Clear();
+
 	for (auto& body : m_Bodies)
 	{
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
-			m_QuadTree->Insert(&body);
 			body.ApplyForceToCenter(m_Gravity * dt);
 			body.Offset(body.GetLinearVelocity() * dt);
 		}
-	}
 
-	m_QuadTree->Update();
+		m_QuadTree->Insert(&body);
+
+		body.RebuildAabb();
+	}
 
 	// TODO Check for collision
 }
@@ -64,6 +66,7 @@ p2Body* p2World::CreateBody(p2BodyDef* bodyDef)
 
 void p2World::SetContactListener(p2ContactListener* contactListener)
 {
+	std::cout << "Contact listener isn't made yet!" << "/n";
 }
 
 p2QuadTree* p2World::GetQuadTree() const

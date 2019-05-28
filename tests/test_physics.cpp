@@ -217,7 +217,7 @@ TEST(Physics, TestShapeContactCpp)
 	json sceneJson;
 	sceneJson["name"] = "Contacts";
 
-	const int entitiesNmb = 10;
+	const int entitiesNmb = 64;
 	json entities[entitiesNmb];
 
 	json shapes[] =
@@ -226,13 +226,13 @@ TEST(Physics, TestShapeContactCpp)
 			{"name","Rect Shape Component"},
 			{"type",sfge::ComponentType::SHAPE2D},
 			{"shape_type", sfge::ShapeType::RECTANGLE},
-			{"size",{100,100}}
+			{"size",{10,10}}
 		},
 		{
 			{"name","Rect Shape Component"},
 			{"type",sfge::ComponentType::SHAPE2D},
 			{"shape_type", sfge::ShapeType::CIRCLE},
-			{"radius",100}
+			{"radius",10}
 		}
 	};
 	json colliderShapes[] =
@@ -241,14 +241,14 @@ TEST(Physics, TestShapeContactCpp)
 			{"name","Rect Collider"},
 			{"type", sfge::ComponentType::COLLIDER2D},
 			{"collider_type",sfge::ColliderType::BOX},
-			{"size",{100,100}},
+			{"size",{10,10}},
 			{"sensor",true}
 		},
 		{
 			{"name","Circle Collider"},
 			{"type", sfge::ComponentType::COLLIDER2D},
 			{"collider_type",sfge::ColliderType::CIRCLE},
-			{"radius",100},
+			{"radius",10},
 			{"sensor",true}
 		}/*,
 		{
@@ -281,7 +281,7 @@ TEST(Physics, TestShapeContactCpp)
 			{"type", sfge::ComponentType::BODY2D},
 			{"body_type",  p2BodyType::DYNAMIC},
 			{"max_colliders",  1},
-			{"velocity", {rand() % 400, rand() % 400}}
+			{"velocity", {rand() % 200, rand() % 200}}
 		};
 
 		const int randShapeIndex = rand() % 2;

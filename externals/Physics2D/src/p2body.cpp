@@ -33,48 +33,57 @@ void p2Body::Init(p2BodyDef* bodyDef)
 	m_LinearVelocity = bodyDef->linearVelocity;
 	m_Type = bodyDef->type;
 
-	m_Aabb.topRight = m_Aabb.topLeft = m_Aabb.bottomRight = m_Aabb.bottomLeft = m_Position;
+	m_Aabb.topRight = m_Aabb.bottomLeft = m_Position;
 
 	if (bodyDef->mass == 0) m_Mass = 1;
 	else { m_Mass = bodyDef->mass; }
+
+	m_Aabb.vertices.resize(4);
+	m_Aabb.edges.resize(4);
+	RebuildAabb();
 }
 
-void p2Body::RebuildAABB()
+void p2Body::RebuildAabb()
 {
 	if (m_Colliders.empty()) return;
 
-	m_Aabb.topRight = m_Aabb.bottomRight = m_Aabb.bottomLeft = m_Aabb.topLeft = m_Position;
+	m_Aabb.topRight = m_Aabb.bottomLeft = m_Position;
 	for (auto& collider : m_Colliders)
 	{
-		collider.RebuildAABB(m_Position, m_Rotation);
+		collider.RebuildAabb(m_Position, m_Rotation);
 
-		const auto colliderAABB = collider.GetAABB();
-		for (auto& vertex : colliderAABB.vertices)
+		const auto colliderAabb = collider.GetAabb();
+		for (auto& vertex : colliderAabb.vertices)
 		{
-			if(vertex.x > m_Aabb.topRight.x || vertex.x > m_Aabb.bottomRight.x)
+			if(vertex.x > m_Aabb.topRight.x)
 			{
 				m_Aabb.topRight.x = vertex.x;
-				m_Aabb.bottomRight.x = vertex.x;
 			}
-			if (vertex.x < m_Aabb.topLeft.x || vertex.x < m_Aabb.bottomLeft.x)
+			if (vertex.x < m_Aabb.bottomLeft.x)
 			{
-				m_Aabb.topLeft.x = vertex.x;
 				m_Aabb.bottomLeft.x = vertex.x;
 			}
 
-			if (vertex.y > m_Aabb.topRight.y || vertex.y > m_Aabb.topLeft.y)
+			if (vertex.y > m_Aabb.topRight.y)
 			{
 				m_Aabb.topRight.y = vertex.y;
-				m_Aabb.topLeft.y = vertex.y;
 			}
-			if (vertex.y < m_Aabb.bottomRight.y || vertex.y < m_Aabb.bottomLeft.y)
+			if (vertex.y < m_Aabb.bottomLeft.y)
 			{
-				m_Aabb.bottomRight.y = vertex.y;
 				m_Aabb.bottomLeft.y = vertex.y;
 			}
 		}
-
 	}
+
+	m_Aabb.vertices[0] = m_Aabb.topRight;
+	m_Aabb.vertices[1] = m_Aabb.topRight - p2Vec2(0, m_Aabb.GetExtends().y);
+	m_Aabb.vertices[2] = m_Aabb.bottomLeft;
+	m_Aabb.vertices[3] = m_Aabb.bottomLeft + p2Vec2(0, m_Aabb.GetExtends().y);
+
+	m_Aabb.edges[0] = p2Vec2::GetVectorFrom(m_Aabb.vertices[0], m_Aabb.vertices[1]);
+	m_Aabb.edges[1] = p2Vec2::GetVectorFrom(m_Aabb.vertices[1], m_Aabb.vertices[2]);
+	m_Aabb.edges[2] = p2Vec2::GetVectorFrom(m_Aabb.vertices[2], m_Aabb.vertices[3]);
+	m_Aabb.edges[3] = p2Vec2::GetVectorFrom(m_Aabb.vertices[3], m_Aabb.vertices[0]);
 }
 
 p2Vec2 p2Body::GetLinearVelocity() const
@@ -115,7 +124,7 @@ void p2Body::ApplyForceToCenter(const p2Vec2& force)
 	m_LinearVelocity += force / m_Mass;
 }
 
-void p2Body::Offset(p2Vec2 offset)
+void p2Body::Offset(const p2Vec2 offset)
 {
 	m_Position += offset;
 	for (auto& collider : m_Colliders)
@@ -124,12 +133,12 @@ void p2Body::Offset(p2Vec2 offset)
 	}
 }
 
-void p2Body::SetPosition(p2Vec2 position)
+void p2Body::SetPosition(const p2Vec2 position)
 {
 	this->m_Position = position;
 }
 
-void p2Body::SetRotation(float rotation)
+void p2Body::SetRotation(const float rotation)
 {
 	this->m_Rotation = rotation;
 }
@@ -144,7 +153,7 @@ float p2Body::GetMass() const
 	return m_Mass;
 }
 
-p2AABB p2Body::GetAABB() const
+p2Aabb p2Body::GetAabb() const
 {
 	return m_Aabb;
 }

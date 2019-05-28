@@ -33,10 +33,8 @@ SOFTWARE.
 class p2Contact
 {
 public:
-	p2Collider* GetColliderA();
-	p2Collider* GetColliderB();
-
-	void SAT(std::vector<p2Collider> colliders);
+	static p2Collider* GetColliderA();
+	static p2Collider* GetColliderB();
 private:
 	bool m_IsContact = false;
 };
@@ -47,8 +45,8 @@ private:
 class p2ContactListener
 {
 public:
-	virtual void BeginContact(p2Contact* contact) = 0;
-	virtual void EndContact(p2Contact* contact) = 0;
+	virtual void BeginContact(p2Contact* contact);
+	virtual void EndContact(p2Contact* contact);
 };
 
 /**
