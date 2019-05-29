@@ -22,6 +22,7 @@ namespace sfge::ext
 		m_Transform2DManager = m_Engine.GetTransform2dManager();
 		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
 		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
+		m_Shape2DManager = m_Graphics2DManager->GetShapeManager();
 		m_InputManager = m_Engine.GetInputManager();
 		m_KeyboardManager = &m_InputManager->GetKeyboardManager();
 
@@ -37,8 +38,10 @@ namespace sfge::ext
 		{
 			const auto transform = m_Transform2DManager->GetComponentPtr(entity);
 			const auto body = m_Body2DManager->GetComponentPtr(entity);
-			m_Bodies.push_back(body->GetBody());
+			const auto shape = m_Shape2DManager->GetComponentPtr(entity);
 			m_Transforms.push_back(transform);
+			m_Bodies.push_back(body->GetBody());
+			m_Shapes.push_back(shape);
 		}
 
 		p2Aabb quadTreeBounds;
@@ -147,6 +150,7 @@ namespace sfge::ext
 		std::vector<p2Vec2> axes;
 		const auto aabbA = bodyA->GetColliders()[0].GetAabb();
 		const auto aabbB = bodyB->GetColliders()[0].GetAabb();
+
 		for (auto& edge : aabbA.edges)
 		{
 			axes.push_back(edge.GetNormal());
@@ -188,12 +192,12 @@ namespace sfge::ext
 
 			if (aMaxProj < bMinProj || bMaxProj < aMinProj)
 			{
-				//return;
+				return;
 			}
 		}
 
-		/*m_Graphics2DManager->DrawLine(meter2pixel(bodyA->GetPosition()), meter2pixel(bodyB->GetPosition()),
-			sf::Color::Green);*/
+		m_Graphics2DManager->DrawLine(meter2pixel(bodyA->GetPosition()), meter2pixel(bodyB->GetPosition()),
+			sf::Color::Green);
 	}
 
 	void Debug::DrawQuadTree(p2QuadTree * quadTree, const sf::Color color) const

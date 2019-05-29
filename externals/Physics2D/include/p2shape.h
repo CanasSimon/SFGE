@@ -41,6 +41,7 @@ enum ShapeType
 class p2Shape
 {
 public:
+	p2Shape();
 	virtual ~p2Shape() = default;
 
 	ShapeType type;

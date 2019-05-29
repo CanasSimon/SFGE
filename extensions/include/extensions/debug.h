@@ -40,6 +40,7 @@ namespace sfge::ext
 		Transform2dManager* m_Transform2DManager;
 		Body2dManager* m_Body2DManager;
 		Graphics2dManager* m_Graphics2DManager;
+		ShapeManager* m_Shape2DManager;
 
 		InputManager* m_InputManager;
 		KeyboardManager* m_KeyboardManager;
@@ -53,8 +54,9 @@ namespace sfge::ext
 
 		sf::Vector2f m_ScreenSize;
 		std::vector<Transform2d*> m_Transforms;
-		std::vector<p2Body*> m_Bodies;
 		std::vector<Entity> m_Entities;
+		std::vector<p2Body*> m_Bodies;
+		std::vector<Shape*> m_Shapes;
 
 		bool m_DrawAabb = false;
 		bool m_DrawSat = false;
