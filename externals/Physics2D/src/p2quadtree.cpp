@@ -13,6 +13,7 @@ void p2QuadTree::Clear()
 {
 	m_Objects.clear();
 	m_Children.clear();
+	m_Children.reserve(MAX_CHILD_TREE_NMB);
 }
 
 void p2QuadTree::Split()

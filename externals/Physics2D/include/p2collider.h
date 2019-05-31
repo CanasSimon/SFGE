@@ -28,6 +28,8 @@ SOFTWARE.
 
 #include <p2shape.h>
 #include <p2aabb.h>
+#include <p2body.h>
+#include <memory>
 
 enum class p2ColliderType
 {

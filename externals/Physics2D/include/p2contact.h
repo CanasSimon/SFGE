@@ -54,6 +54,6 @@ public:
 */
 class p2ContactManager
 {
-
+	std::vector<p2Contact*> m_PossibleContacts = {nullptr};
 };
 #endif

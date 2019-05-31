@@ -11,7 +11,7 @@ namespace sfge::ext
 
 	Debug::Debug(Engine& engine) :
 		System(engine), m_PhysicsManager(), m_World(), m_Transform2DManager(), m_Body2DManager(),
-		m_Graphics2DManager(), m_InputManager(), m_KeyboardManager(), m_QuadTree()
+		m_Graphics2DManager(), m_Shape2DManager(), m_InputManager(), m_KeyboardManager(), m_QuadTree()
 	{
 	}
 
@@ -48,8 +48,6 @@ namespace sfge::ext
 		quadTreeBounds.bottomLeft = p2Vec2(0, 0);
 		quadTreeBounds.topRight = pixel2meter(m_ScreenSize);
 		m_QuadTree->SetBounds(quadTreeBounds);
-
-		m_QuadTree->Split();
 	}
 
 	void Debug::OnUpdate(float dt)
@@ -57,9 +55,15 @@ namespace sfge::ext
 		(void)dt;
 
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::A)) m_DrawAabb = !m_DrawAabb;
-		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::S)) m_DrawSat = !m_DrawSat;
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::Q)) m_DrawQuadTree = !m_DrawQuadTree;
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::C)) m_QuadTree->Clear();
+
+		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Up)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, -1));
+		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Down)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, 1));
+		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Right)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(1, 0));
+		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Left)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(-1, 0));
+
+		m_Bodies[0]->SetLinearVelocity(m_Bodies[0]->GetLinearVelocity() / 1.2);
 
 		for (auto& body : m_Bodies)
 		{
@@ -95,23 +99,17 @@ namespace sfge::ext
 	void Debug::OnDraw()
 	{
 		rmt_ScopedCPUSample(DrawAABBDraw, 0);
-		m_Axes.clear();
 
-		if(m_DrawSat)
+		if(CheckSat(&m_Bodies[0]->GetColliders()[0], &m_Bodies[1]->GetColliders()[0]))
 		{
-			for (auto& body : m_Bodies)
-			{
-				for (auto& collider : body->GetColliders())
-				{
-					for (auto& edge : collider.GetAabb().edges)
-					{
-						m_Axes.push_back(edge.GetNormal());
-					}
-				}
-			}
+			m_Shapes[0]->SetFillColor(sf::Color::Green);
+			m_Shapes[1]->SetFillColor(sf::Color::Green);
 		}
-
-		if (m_DrawSat) DrawSat(m_Bodies[0], m_Bodies[1]);
+		else
+		{
+			m_Shapes[0]->SetFillColor(sf::Color::Red);
+			m_Shapes[1]->SetFillColor(sf::Color::Red);
+		}
 
 		if (m_DrawQuadTree)
 		{
@@ -123,14 +121,14 @@ namespace sfge::ext
 			}
 		}
 
-		if (m_DrawSat || m_DrawAabb)
+		if (m_DrawAabb)
 		{
 			for (auto& body : m_Bodies)
 			{
-				if (m_DrawAabb) DrawAabb(body->GetAabb(), sf::Color::Red);
+				DrawAabb(body->GetAabb(), sf::Color::Red);
 				for (auto& collider : body->GetColliders())
 				{
-					if (m_DrawAabb) DrawAabb(collider.GetAabb(), sf::Color::Green);
+					DrawAabb(collider.GetAabb(), sf::Color::Green);
 				}
 			}
 		}
@@ -145,26 +143,51 @@ namespace sfge::ext
 		}
 	}
 
-	void Debug::DrawSat(const p2Body* bodyA, const p2Body* bodyB) const
+	bool Debug::CheckSat(const p2Collider* bodyA, const p2Collider* bodyB)
 	{
-		std::vector<p2Vec2> axes;
-		const auto aabbA = bodyA->GetColliders()[0].GetAabb();
-		const auto aabbB = bodyB->GetColliders()[0].GetAabb();
-
-		for (auto& edge : aabbA.edges)
+		switch (bodyA->GetType())
 		{
-			axes.push_back(edge.GetNormal());
+		case p2ColliderType::CIRCLE:
+			switch (bodyB->GetType())
+			{
+			case p2ColliderType::CIRCLE:
+				return CheckCircleSat(bodyA, bodyB);
+			case p2ColliderType::RECT:
+				return CheckCircleBoxSat(bodyA, bodyB);
+			default:
+				return false;
+			}
+		case p2ColliderType::RECT:
+			switch (bodyB->GetType())
+			{
+			case p2ColliderType::CIRCLE:
+				return CheckCircleBoxSat(bodyB, bodyA);
+			case p2ColliderType::RECT:
+				return CheckBoxSat(bodyB, bodyA);
+			default:
+				return false;
+			}
+		default:
+			return false;
+		}
+	}
 
-			const auto linePos = aabbA.GetCenter() + edge * 2;
-			m_Graphics2DManager->DrawLine(meter2pixel(linePos + edge.GetNormal() * 500), meter2pixel(linePos - edge.GetNormal() * 500), sf::Color::Blue);
+	bool Debug::CheckBoxSat(const p2Collider* bodyA, const p2Collider* bodyB)
+	{
+		//Code edited from https://gist.github.com/nyorain/dc5af42c6e83f7ac6d831a2cfd5fbece
+		std::vector<p2Vec2> axes;
+		const auto aabbA = bodyA->GetAabb();
+		const auto aabbB = bodyB->GetAabb();
+		axes.reserve(aabbA.edges.size() / 2 + aabbB.edges.size() / 2);
+
+		for (auto i = 0u; i < aabbA.edges.size() / 2; ++i)
+		{
+			axes.push_back(aabbA.edges[i].GetNormal());
 		}
 
-		for (auto& edge : aabbB.edges)
+		for (auto i = 0u; i < aabbB.edges.size() / 2; ++i)
 		{
-			axes.push_back(edge.GetNormal());
-
-			const auto linePos = aabbB.GetCenter() + edge * 2;
-			m_Graphics2DManager->DrawLine(meter2pixel(linePos + edge.GetNormal() * 500), meter2pixel(linePos - edge.GetNormal() * 500), sf::Color::Blue);
+			axes.push_back(aabbB.edges[i].GetNormal());
 		}
 
 		for (auto& axis : axes)
@@ -179,8 +202,6 @@ namespace sfge::ext
 				const auto proj = p2Vec2::Dot(axis, vertex);
 				if (proj < aMinProj) aMinProj = proj;
 				if (proj > aMaxProj) aMaxProj = proj;
-
-				m_Graphics2DManager->DrawLine(meter2pixel(vertex.GetProjectionOn(axis)), meter2pixel(vertex), sf::Color::Magenta);
 			}
 
 			for (auto& vertex : aabbB.vertices)
@@ -190,14 +211,72 @@ namespace sfge::ext
 				if (proj > bMaxProj) bMaxProj = proj;
 			}
 
+			if (aMaxProj < bMinProj || bMaxProj < aMinProj) return false;
+		}
+
+		return true;
+	}
+
+	bool Debug::CheckCircleSat(const p2Collider* bodyA, const p2Collider* bodyB)
+	{
+		const auto distance = bodyA->position.GetDistance(bodyB->position);
+
+		return distance <= bodyA->GetHalfExtend().x + bodyB->GetHalfExtend().x;
+	}
+
+	bool Debug::CheckCircleBoxSat(const p2Collider* bodyA, const p2Collider* bodyB)
+	{
+		const auto aabbA = bodyA->GetAabb();
+		const auto aabbB = bodyB->GetAabb();
+
+		for (auto i = 0u; i < aabbB.vertices.size() / 2; ++i)
+		{
+			if (aabbA.GetCenter().LineSide(aabbB.vertices[i], aabbB.vertices[i + 1]) == 1 &&
+				aabbA.GetCenter().LineSide(aabbB.vertices[i + 2], aabbB.vertices[(i + 3) % aabbB.vertices.size()]) == 1)
+			{
+				goto InZone;
+			}
+		}
+		goto NotInZone;
+
+	InZone:
+		std::cout << "In zone" << "\n";
+		for (auto i = 0u; i < aabbB.edges.size() / 2; ++i)
+		{
+			const auto aPoint1 = aabbA.GetCenter() - bodyA->GetHalfExtend();
+			const auto aPoint2 = aabbA.GetCenter() + bodyA->GetHalfExtend();
+			const auto aMaxProj = p2Vec2::Dot(aabbA.edges[i], aPoint1);
+			const auto aMinProj = p2Vec2::Dot(aabbA.edges[i], aPoint2);
+			auto bMaxProj = -std::numeric_limits<float>::infinity();
+			auto bMinProj = std::numeric_limits<float>::infinity();
+
+			for (auto& vertex : aabbB.vertices)
+			{
+				const auto proj = p2Vec2::Dot(aabbA.edges[i], vertex);
+				if (proj < bMinProj) bMinProj = proj;
+				if (proj > bMaxProj) bMaxProj = proj;
+			}
+
 			if (aMaxProj < bMinProj || bMaxProj < aMinProj)
 			{
-				return;
+				return false;
 			}
 		}
 
-		m_Graphics2DManager->DrawLine(meter2pixel(bodyA->GetPosition()), meter2pixel(bodyB->GetPosition()),
-			sf::Color::Green);
+		return true;
+
+	NotInZone:
+		std::cout << "Not in zone" << "\n";
+		auto dist = std::numeric_limits<float>::infinity();
+		for (auto& vertex : aabbB.vertices)
+		{
+			if (vertex.GetDistance(aabbA.GetCenter()) < dist)
+			{
+				dist = vertex.GetDistance(aabbA.GetCenter());
+			}
+		}
+
+		return dist < bodyA->GetHalfExtend().x;
 	}
 
 	void Debug::DrawQuadTree(p2QuadTree * quadTree, const sf::Color color) const

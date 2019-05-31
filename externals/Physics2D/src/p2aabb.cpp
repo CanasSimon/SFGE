@@ -31,7 +31,7 @@ p2Vec2 p2Aabb::GetCenter() const
 
 p2Vec2 p2Aabb::GetExtends() const
 {
-	return { topRight.x - bottomLeft.x, topRight.y - bottomLeft.y};
+	return { topRight - bottomLeft};
 }
 
 bool p2Aabb::DoContain(const p2Aabb aabb) const

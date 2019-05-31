@@ -154,6 +154,11 @@ float p2Vec2::GetMagnitude() const
 	return sqrt(pow(x, 2) + pow(y, 2));
 }
 
+float p2Vec2::GetDistance(const p2Vec2& v1) const
+{
+	return sqrt(pow(x - v1.x, 2) + pow(y - v1.y, 2));
+}
+
 p2Vec2 p2Vec2::Normalized() const
 {
 	const auto magnitude = GetMagnitude();
@@ -222,6 +227,11 @@ bool p2Vec2::OnSegment(const p2Vec2& v1, const p2Vec2& v2) const
 {
 	return v1.x <= std::max(x, v2.x) && v1.x >= std::min(x, v2.x) &&
 		v1.y <= std::max(y, v2.y) && v1.y >= std::min(y, v2.y);
+}
+
+int p2Vec2::LineSide(const p2Vec2& v1, const p2Vec2& v2) const
+{
+	return signbit((v2.x - v1.x) * (y - v1.y) - (v2.y - v1.y) * (x - v1.x));
 }
 
 bool p2Vec2::DoOverlap(const p2Vec2& v1, const p2Vec2& v2, const p2Vec2& w1, const p2Vec2& w2)

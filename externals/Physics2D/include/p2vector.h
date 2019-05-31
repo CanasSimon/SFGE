@@ -53,6 +53,7 @@ struct p2Vec2
 	static float Dot(p2Vec2 v1, p2Vec2 v2);
 	static float Cross(p2Vec2 v1, p2Vec2 v2);
 	float GetMagnitude() const;
+	float GetDistance(const p2Vec2& v1) const;
 	p2Vec2 Normalized() const;
 	void NormalizeSelf();
 	p2Vec2 Absolute() const;
@@ -67,6 +68,7 @@ struct p2Vec2
 	p2Vec2 GetReflection(const p2Vec2& n) const;
 
 	bool OnSegment(const p2Vec2& v1, const p2Vec2& v2) const;
+	int LineSide(const p2Vec2& v1, const p2Vec2& v2) const;
 	static bool DoOverlap(const p2Vec2& v1, const p2Vec2& v2, const p2Vec2& w1, const p2Vec2& w2);
 
 	p2Vec3 To3() const;

@@ -113,7 +113,7 @@ float p2Body::GetRotation() const
 
 p2Collider* p2Body::CreateCollider(p2ColliderDef* colliderDef)
 {
-	p2Collider& collider = m_Colliders[m_ColliderIndex];
+	auto& collider = m_Colliders[m_ColliderIndex];
 	collider.Init(colliderDef);
 	m_ColliderIndex++;
 	return &collider;

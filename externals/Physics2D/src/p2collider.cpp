@@ -1,4 +1,5 @@
 #include "../include/p2collider.h"
+#include <iostream>
 
 p2Collider::p2Collider() = default;
 
@@ -10,6 +11,8 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 	offset = colliderDef->offset;
 	m_ColliderType = colliderDef->colliderType;
 	m_ColliderDefinition = *colliderDef;
+
+	std::cout << m_Shape->type << "\n";
 
 	switch (m_ColliderType)
 	{

@@ -46,11 +46,13 @@ namespace sfge::ext
 		KeyboardManager* m_KeyboardManager;
 
 		void DrawAabb(p2Aabb aabb, sf::Color color) const;
-		void DrawSat(const p2Body* body1, const p2Body* body2) const;
+		static bool CheckSat(const p2Collider* bodyA, const p2Collider* bodyB);
+		static bool CheckBoxSat(const p2Collider* bodyA, const p2Collider* bodyB);
+		static bool CheckCircleSat(const p2Collider* bodyA, const p2Collider* bodyB);
+		static bool CheckCircleBoxSat(const p2Collider* bodyA, const p2Collider* bodyB);
 		void DrawQuadTree(p2QuadTree * quadTree, sf::Color color) const;
 
 		p2QuadTree* m_QuadTree;
-		std::vector<p2Vec2> m_Axes;
 
 		sf::Vector2f m_ScreenSize;
 		std::vector<Transform2d*> m_Transforms;
@@ -59,7 +61,6 @@ namespace sfge::ext
 		std::vector<Shape*> m_Shapes;
 
 		bool m_DrawAabb = false;
-		bool m_DrawSat = false;
 		bool m_DrawQuadTree = false;
 	};
 }
