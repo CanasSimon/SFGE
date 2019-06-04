@@ -44,7 +44,7 @@ TEST(Physics, TestBallFallingToGround)
 
 	json transformJson1;
 	transformJson1["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson1["position"] = { 600,300 };
+	transformJson1["position"] = { 700,300 };
 	transformJson1["scale"] = { 1.0,1.0 };
 	transformJson1["angle"] = 0.0;
 
@@ -74,7 +74,7 @@ TEST(Physics, TestBallFallingToGround)
 
 	json transformJson2;
 	transformJson2["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson2["position"] = { 600,600 };
+	transformJson2["position"] = { 700,600 };
 	transformJson2["scale"] = { 1.0,1.0 };
 	transformJson2["angle"] = 0.0;
 
@@ -99,17 +99,15 @@ TEST(Physics, TestBallFallingToGround)
 	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };
 
 	sceneJson["entities"] = { entityBody1, entityBody2 };
-	json contactDebugSystem = {
-		{ "script_path", "scripts/contact_debug_system.py" }
-	};
-	json raycastDebugJson =
-	{
-		{ "script_path", 
-			//"scripts/mouse_raycast_system.py" 
-			"nothing"
+	sceneJson["systems"] = json::array({
+		{
+			{"script_path", "scripts/contact_debug_system.py"}
+		},
+		{
+			{"systemClassName", "Debug"}
 		}
-	};
-	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson });
+	});
+
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 
@@ -163,10 +161,8 @@ TEST(Physics, TestShapeContact)
 		}
 	};
 
-	for (int i = 0; i < entitiesNmb; i++)
+	for (auto& entityJson : entities)
 	{
-		json& entityJson = entities[i];
-
 		json transformJson =
 		{
 			{"position",{ rand() % 800,rand() % 600 }},
@@ -195,12 +191,11 @@ TEST(Physics, TestShapeContact)
 			{ "script_path", "scripts/stay_onscreen_system.py" }
 		}
 		/*{
-			{ "script_path", 
-			//"scripts/mouse_raycast_system.py" 
-			"nothing" }
+			{ "script_path", "scripts/mouse_raycast_system.py" }
 		}*/
 	}
 	);
+
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
@@ -217,7 +212,7 @@ TEST(Physics, TestShapeContactCpp)
 	json sceneJson;
 	sceneJson["name"] = "Contacts";
 
-	const int entitiesNmb = 64;
+	const auto entitiesNmb = 8;
 	json entities[entitiesNmb];
 
 	json shapes[] =
@@ -226,13 +221,13 @@ TEST(Physics, TestShapeContactCpp)
 			{"name","Rect Shape Component"},
 			{"type",sfge::ComponentType::SHAPE2D},
 			{"shape_type", sfge::ShapeType::RECTANGLE},
-			{"size",{10,10}}
+			{"size",{50,50}}
 		},
 		{
-			{"name","Rect Shape Component"},
+			{"name","Circle Shape Component"},
 			{"type",sfge::ComponentType::SHAPE2D},
 			{"shape_type", sfge::ShapeType::CIRCLE},
-			{"radius",10}
+			{"radius",25}
 		}
 	};
 	json colliderShapes[] =
@@ -241,14 +236,14 @@ TEST(Physics, TestShapeContactCpp)
 			{"name","Rect Collider"},
 			{"type", sfge::ComponentType::COLLIDER2D},
 			{"collider_type",sfge::ColliderType::BOX},
-			{"size",{10,10}},
+			{"size",{50,50}},
 			{"sensor",true}
 		},
 		{
 			{"name","Circle Collider"},
 			{"type", sfge::ComponentType::COLLIDER2D},
 			{"collider_type",sfge::ColliderType::CIRCLE},
-			{"radius",10},
+			{"radius",25},
 			{"sensor",true}
 		}/*,
 		{
@@ -265,10 +260,8 @@ TEST(Physics, TestShapeContactCpp)
 		}*/
 	};
 
-	for (int i = 0; i < entitiesNmb; i++)
+	for (auto& entityJson : entities)
 	{
-		json& entityJson = entities[i];
-
 		json transformJson =
 		{
 			{"position",{ rand() % 800,rand() % 600 }},
@@ -284,7 +277,7 @@ TEST(Physics, TestShapeContactCpp)
 			{"velocity", {rand() % 200, rand() % 200}}
 		};
 
-		const int randShapeIndex = rand() % 2;
+		const auto randShapeIndex = rand() % 2;
 		entityJson["components"] = { transformJson, shapes[randShapeIndex], rigidbody, colliderShapes[randShapeIndex] };
 	}
 
@@ -294,7 +287,7 @@ TEST(Physics, TestShapeContactCpp)
 				{"systemClassName", "Debug"}
 			},
 			{
-				{"systemClassName", "BodyTest"}
+				{"script_path", "scripts/contact_debug_system.py"}
 			}
 		}
 	);

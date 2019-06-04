@@ -50,7 +50,7 @@ struct p2BodyDef
 	p2Vec2 linearVelocity;
 	float gravityScale;
 	float mass;
-	size_t maxColliderCount;
+	size_t maxColliderCount = 4;
 };
 
 /**
@@ -85,16 +85,16 @@ public:
 	std::vector<p2Collider> GetColliders() const;
 private:
 	p2BodyDef m_BodyDefinition{};
-	p2Aabb m_Aabb;
-	p2Vec2 m_Position;
+	p2Aabb m_Aabb{};
+	p2Vec2 m_Position = {0, 0};
 	float m_Rotation = 0;
-	p2Vec2 m_LinearVelocity;
+	p2Vec2 m_LinearVelocity = {0, 0};
 	float m_AngularVelocity = 0;
 	float m_Mass = 1;
 	p2BodyType m_Type = p2BodyType::STATIC;
 
-	size_t m_MaxColliderCount = 4;
-	int m_ColliderIndex = 0;
+	int m_MaxColliderCount = 4;
+	int m_ColliderInitIndex = 0;
 	std::vector<p2Collider> m_Colliders;
 };
 

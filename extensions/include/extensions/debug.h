@@ -45,6 +45,8 @@ namespace sfge::ext
 		InputManager* m_InputManager;
 		KeyboardManager* m_KeyboardManager;
 
+		p2ContactManager m_ContactManager;
+
 		void DrawAabb(p2Aabb aabb, sf::Color color) const;
 		static bool CheckSat(const p2Collider* bodyA, const p2Collider* bodyB);
 		static bool CheckBoxSat(const p2Collider* bodyA, const p2Collider* bodyB);

@@ -1,4 +1,4 @@
-#include "../include/p2collider.h"
+#include <p2collider.h>
 #include <iostream>
 
 p2Collider::p2Collider() = default;
@@ -36,7 +36,7 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 		}
 	case p2ColliderType::POLY:
 		{
-			const auto polyShape = static_cast<p2PolygonShape*>(m_Shape);
+			const auto polyShape = dynamic_cast<p2PolygonShape*>(m_Shape);
 
 			p2Vec2 extend;
 			for (auto& point : polyShape->GetPoints())

@@ -43,6 +43,6 @@ struct p2Aabb
 	p2Vec2 GetExtends() const;
 	bool DoContain(p2Aabb aabb) const;
 	bool DoContain(p2Vec2 position) const;
-	bool DoOverlapWith(p2Aabb aabb) const;
+	static bool DoOverlapWith(p2Aabb aabbA, p2Aabb aabbB);
 };
 #endif // !SFGE_P2AABB:H

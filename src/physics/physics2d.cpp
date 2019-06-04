@@ -109,7 +109,7 @@ float Physics2dManager::Raycast(Vec2f startPoint, Vec2f direction, float rayLeng
 	return rayCastCallback.fraction;
 }
 */
-void ContactListener::BeginContact(p2Contact* contact)
+void ContactListener::AddContact(p2Contact* contact)
 {
 	auto* pythonEngine = m_Engine.GetPythonEngine();
 	const auto colliderA = static_cast<ColliderData*>(contact->GetColliderA()->GetUserData());
@@ -122,17 +122,17 @@ void ContactListener::BeginContact(p2Contact* contact)
 	}*/
 
 	auto& pySystems = pythonEngine->GetPySystemManager().GetPySystems();
-	for(size_t i = 0;i < pySystems.size();i++)
+	for (auto& pySystem : pySystems)
 	{
-		if(pySystems[i] != nullptr)
+		if(pySystem != nullptr)
 		{
-			pySystems[i]->OnContact(colliderA, colliderB, true);
+			pySystem->OnContact(colliderA, colliderB, true);
 		}
 	}
 		
 }
 
-void ContactListener::EndContact(p2Contact* contact)
+void ContactListener::DeleteContact(p2Contact* contact)
 {
 	auto pythonEngine = m_Engine.GetPythonEngine();
 	auto* colliderA = static_cast<ColliderData*>(contact->GetColliderA()->GetUserData());
@@ -145,11 +145,11 @@ void ContactListener::EndContact(p2Contact* contact)
 	}*/
 
 	auto& pySystems = pythonEngine->GetPySystemManager().GetPySystems();
-	for (size_t i = 0; i < pySystems.size(); i++)
+	for (auto& pySystem : pySystems)
 	{
-		if (pySystems[i] != nullptr)
+		if (pySystem != nullptr)
 		{
-			pySystems[i]->OnContact(colliderA, colliderB, false);
+			pySystem->OnContact(colliderA, colliderB, false);
 		}
 	}
 }

@@ -197,7 +197,7 @@ void SceneManager::LoadSceneFromJson(json& sceneJson, std::unique_ptr<editor::Sc
 		}
 		for(auto& entityJson : sceneJson["entities"])
 		{
-			Entity entity = INVALID_ENTITY;
+			auto entity = INVALID_ENTITY;
 			entity = m_EntityManager->CreateEntity(INVALID_ENTITY);
 			if(entity == INVALID_ENTITY)
 			{
@@ -309,7 +309,7 @@ void SceneManager::LoadSceneFromName(const std::string& sceneName)
 }
 void SceneManager::AddComponentManager(IComponentFactory *componentFactory, ComponentType componentType)
 {
-	const auto index = static_cast<int>(log2((double)componentType));
+	const auto index = static_cast<int>(log2(static_cast<double>(componentType)));
 	m_ComponentManager[index] = componentFactory;
 }
 void SceneManager::OnUpdate(float dt)

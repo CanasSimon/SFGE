@@ -58,7 +58,7 @@ public:
 	/**
 	* Return a list of all the p2Body that might collide
 	*/
-	std::list<p2Body*> Retrieve(p2Body* rect);
+	std::vector<p2Body*> Retrieve(const p2Body* rect);
 
 	void SetBounds(p2Aabb bounds);
 	p2Aabb GetBounds() const;

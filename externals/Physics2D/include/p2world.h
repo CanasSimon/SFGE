@@ -50,16 +50,20 @@ public:
 	/**
 	* \brief Set the contact listener
 	*/
-	static void SetContactListener(p2ContactListener* contactListener);
+	void SetContactListener(p2ContactListener* contactLis);
+	p2ContactListener* GetContactListener() const;
+	p2ContactManager GetContactManager() const;
 
 	p2QuadTree * GetQuadTree() const;
 private:
 
 	p2Vec2 m_Gravity;
 	p2Aabb m_QuadTreeBounds;
+	p2ContactManager m_ContactManager;
+	p2ContactListener* m_ContactListener;
 	p2QuadTree* m_QuadTree;
 	std::vector<p2Body> m_Bodies;
-	int m_BodyIndex = 0;
+	int m_BodyInitIndex = 0;
 };
 
 #endif

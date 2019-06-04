@@ -44,12 +44,17 @@ bool p2Aabb::DoContain(const p2Vec2 position) const
 	return position > bottomLeft && position < topRight;
 }
 
-bool p2Aabb::DoOverlapWith(p2Aabb aabb) const
+bool p2Aabb::DoOverlapWith(const p2Aabb aabbA, const p2Aabb aabbB)
 {
-	for (auto& vertex : aabb.vertices)
-	{
-		if (DoContain(vertex)) return true;
-	}
-
-	return false;
+	return aabbA.bottomLeft.x < aabbB.topRight.x && aabbA.topRight.x > aabbB.bottomLeft.x &&
+		aabbA.topRight.y > aabbB.bottomLeft.y && aabbA.bottomLeft.y < aabbB.topRight.y;
 }
+
+/*bool p2Aabb::DoOverlapWith(p2Contact contact)
+{
+	const auto aabbA = contact.GetColliderA()->GetAabb();
+	const auto aabbB = contact.GetColliderB()->GetAabb();
+
+	return aabbA.bottomLeft.x < aabbB.topRight.x && aabbA.topRight.x > aabbB.bottomLeft.x &&
+		aabbA.topRight.y > aabbB.bottomLeft.y && aabbA.bottomLeft.y < aabbB.topRight.y;
+}*/

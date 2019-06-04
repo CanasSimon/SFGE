@@ -1,3 +1,4 @@
+#include <iostream>
 #include <extensions/debug.h>
 #include <engine/engine.h>
 #include <engine/config.h>
@@ -91,34 +92,27 @@ namespace sfge::ext
 
 	void Debug::OnFixedUpdate()
 	{
-		rmt_ScopedCPUSample(DrawAABBFixedUpdate, 0);
+		rmt_ScopedCPUSample(DebugFixedUpdate, 0);
 
 		m_Transforms[0]->EulerAngle += 1;
 	}
 
 	void Debug::OnDraw()
 	{
-		rmt_ScopedCPUSample(DrawAABBDraw, 0);
+		rmt_ScopedCPUSample(DebugDraw, 0);
 
-		if(CheckSat(&m_Bodies[0]->GetColliders()[0], &m_Bodies[1]->GetColliders()[0]))
+		for (auto& contact : m_World->GetContactManager().GetContacts())
 		{
-			m_Shapes[0]->SetFillColor(sf::Color::Green);
-			m_Shapes[1]->SetFillColor(sf::Color::Green);
-		}
-		else
-		{
-			m_Shapes[0]->SetFillColor(sf::Color::Red);
-			m_Shapes[1]->SetFillColor(sf::Color::Red);
+			const auto colliderA = contact.GetColliderA();
+			const auto colliderB = contact.GetColliderB();
+
+			m_Graphics2DManager->DrawLine(meter2pixel(colliderA->position),
+				meter2pixel(colliderB->position), sf::Color::Blue);
 		}
 
 		if (m_DrawQuadTree)
 		{
 			DrawQuadTree(m_QuadTree, sf::Color::Red);
-
-			for (auto& bodies : m_QuadTree->Retrieve(m_Bodies[0]))
-			{
-				m_Graphics2DManager->DrawLine(meter2pixel(bodies->GetPosition()), Vec2f(0, 0), sf::Color::White);
-			}
 		}
 
 		if (m_DrawAabb)
@@ -226,8 +220,8 @@ namespace sfge::ext
 
 	bool Debug::CheckCircleBoxSat(const p2Collider* bodyA, const p2Collider* bodyB)
 	{
-		const auto aabbA = bodyA->GetAabb();
-		const auto aabbB = bodyB->GetAabb();
+		const p2Aabb aabbA = bodyA->GetAabb();
+		const p2Aabb aabbB = bodyB->GetAabb();
 
 		for (auto i = 0u; i < aabbB.vertices.size() / 2; ++i)
 		{

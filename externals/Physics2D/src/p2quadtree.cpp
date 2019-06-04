@@ -46,7 +46,7 @@ void p2QuadTree::Split()
 	{
 		for (auto* child : m_Children)
 		{
-			if (child->m_Bounds.DoOverlapWith(obj->GetAabb())) child->Insert(obj);
+			if (p2Aabb::DoOverlapWith(child->m_Bounds, obj->GetAabb())) child->Insert(obj);
 		}
 	}
 
@@ -68,16 +68,16 @@ int p2QuadTree::GetIndex(p2Body * rect)
 	return 0;
 }
 
-void p2QuadTree::Insert(p2Body * obj)
+void p2QuadTree::Insert(p2Body* obj)
 {
 	if (!m_Children.empty())
 	{
 		for (auto* child : m_Children)
 		{
-			if (child->m_Bounds.DoOverlapWith(obj->GetAabb())) child->Insert(obj);
+			if (p2Aabb::DoOverlapWith(child->m_Bounds, obj->GetAabb())) child->Insert(obj);
 		}
 	}
-	else 
+	else
 	{
 		m_Objects.push_back(obj);
 	}
@@ -87,18 +87,18 @@ void p2QuadTree::Insert(p2Body * obj)
 	}
 }
 
-std::list<p2Body*> p2QuadTree::Retrieve(p2Body* rect)
+std::vector<p2Body*> p2QuadTree::Retrieve(const p2Body* rect)
 {
-	std::list<p2Body*> returnValue;
+	std::vector<p2Body*> returnValue;
 	for (auto& body : m_Objects)
 	{
-		if (body == rect) returnValue = m_Objects;
+		if (body == rect) returnValue = { std::begin(m_Objects), std::end(m_Objects) };
 	}
 
 	for (auto& child : m_Children)
 	{
 		const auto retrieve = child->Retrieve(rect);
-		if(!retrieve.empty())
+		if (!retrieve.empty())
 		{
 			returnValue = retrieve;
 			break;

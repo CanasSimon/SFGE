@@ -134,7 +134,6 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 				break;*/
 			default:
 				{
-					system("pause");
 					std::ostringstream oss;
 					oss << "[Error] Collider of type: " << static_cast<int>(colliderType) <<
 						" could not be loaded from json: " << componentJson;

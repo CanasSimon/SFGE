@@ -50,9 +50,9 @@ class ContactListener : public p2ContactListener
 {
 public:
 	ContactListener(Engine& engine);
-	void BeginContact(p2Contact* contact) override;
+	void AddContact(p2Contact* contact) override;
 
-	void EndContact(p2Contact* contact) override;
+	void DeleteContact(p2Contact* contact) override;
 protected:
 	Engine & m_Engine;
 };

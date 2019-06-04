@@ -26,7 +26,7 @@ SOFTWARE.
 #include <iostream>
 
 
-p2World::p2World(const p2Vec2& gravity): m_Gravity(gravity)
+p2World::p2World(const p2Vec2& gravity): m_Gravity(gravity), m_ContactListener()
 {
 	m_Bodies.resize(MAX_BODY_LEN);
 
@@ -44,29 +44,55 @@ void p2World::Step(const float dt)
 	{
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
-			body.ApplyForceToCenter(m_Gravity * dt);
 			body.Offset(body.GetLinearVelocity() * dt);
+			body.ApplyForceToCenter(m_Gravity * dt);
 		}
 
 		m_QuadTree->Insert(&body);
 
+		/*for (auto& bodyB : m_Bodies)
+		{
+			if (&body == &bodyB) continue;
+			m_ContactManager.TestContacts(body, bodyB);
+		}*/
+
 		body.RebuildAabb();
 	}
 
-	// TODO Check for collision
+	if(p2ContactManager::CheckSat(new p2Contact(&m_Bodies[0].GetColliders()[0], &m_Bodies[1].GetColliders()[0])))
+	{
+		m_Bodies[0].ApplyForceToCenter(m_Bodies[0].GetLinearVelocity() * -1);
+	}
 }
 
 p2Body* p2World::CreateBody(p2BodyDef* bodyDef)
 {
-	p2Body& body = m_Bodies[m_BodyIndex];
+	if (m_BodyInitIndex + 1 > m_Bodies.size())
+	{
+		m_Bodies.resize(m_Bodies.size() + MAX_BODY_LEN);
+	}
+
+	auto& body = m_Bodies[m_BodyInitIndex];
 	body.Init(bodyDef);
-	m_BodyIndex++;
+	m_BodyInitIndex++;
+
 	return &body;
 }
 
-void p2World::SetContactListener(p2ContactListener* contactListener)
+void p2World::SetContactListener(p2ContactListener* contactLis)
 {
-	std::cout << "Contact listener isn't made yet!" << "/n";
+	m_ContactListener = contactLis;
+	m_ContactManager.contactListener = contactLis;
+}
+
+p2ContactListener* p2World::GetContactListener() const
+{
+	return m_ContactListener;
+}
+
+p2ContactManager p2World::GetContactManager() const
+{
+	return m_ContactManager;
 }
 
 p2QuadTree* p2World::GetQuadTree() const

@@ -23,7 +23,7 @@ class ContactDebugSystem(System):
             if count > 0:
                 shape.set_fill_color(Color.Green)
             else:
-                shape.set_fill_color(Color.White)
+                shape.set_fill_color(Color.Red)
 
     def on_contact(self, c1, c2, enter):
         # print("Contact between {0} and {1} with enter: {2}".format(str(c1), str(c2), str(enter)))

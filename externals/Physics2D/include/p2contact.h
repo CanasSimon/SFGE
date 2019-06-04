@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef SFGE_P2CONTACT_H
 #define SFGE_P2CONTACT_H
 
-#include <p2collider.h>
+#include <p2body.h>
 
 /**
 * \brief Representation of a contact given as argument in a p2ContactListener
@@ -33,10 +33,13 @@ SOFTWARE.
 class p2Contact
 {
 public:
-	static p2Collider* GetColliderA();
-	static p2Collider* GetColliderB();
+	p2Contact(p2Collider* colliderA, p2Collider* colliderB);
+
+	p2Collider* GetColliderA() const;
+	p2Collider* GetColliderB() const;
 private:
-	bool m_IsContact = false;
+	p2Collider* m_ColliderA = nullptr;
+	p2Collider* m_ColliderB = nullptr;
 };
 
 /**
@@ -45,8 +48,8 @@ private:
 class p2ContactListener
 {
 public:
-	virtual void BeginContact(p2Contact* contact);
-	virtual void EndContact(p2Contact* contact);
+	virtual void AddContact(p2Contact* contact) = 0;
+	virtual void DeleteContact(p2Contact* contact) = 0;
 };
 
 /**
@@ -54,6 +57,18 @@ public:
 */
 class p2ContactManager
 {
-	std::vector<p2Contact*> m_PossibleContacts = {nullptr};
+public:
+	void TestContacts(const p2Body& bodyA, const p2Body& bodyB);
+	int CheckContact(p2Contact contact);
+
+	static bool CheckSat(p2Contact* contact);
+	static bool CheckBoxSat(p2Contact* contact);
+	static bool CheckCircleSat(p2Contact* contact);
+	static bool CheckCircleBoxSat(p2Contact* contact);
+
+	std::vector<p2Contact> GetContacts() const;
+	std::vector<p2Contact> possibleContacts;
+
+	p2ContactListener* contactListener;
 };
 #endif
