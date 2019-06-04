@@ -50,18 +50,17 @@ void p2World::Step(const float dt)
 
 		m_QuadTree->Insert(&body);
 
-		/*for (auto& bodyB : m_Bodies)
+		const auto retrieve = m_QuadTree->Retrieve(&body);
+		for (auto& bodyB : retrieve)
 		{
-			if (&body == &bodyB) continue;
-			m_ContactManager.TestContacts(body, bodyB);
-		}*/
-
-		body.RebuildAabb();
-	}
-
-	if(p2ContactManager::CheckSat(new p2Contact(&m_Bodies[0].GetColliders()[0], &m_Bodies[1].GetColliders()[0])))
-	{
-		m_Bodies[0].ApplyForceToCenter(m_Bodies[0].GetLinearVelocity() * -1);
+			if(&body == bodyB) continue;
+			const auto check = p2ContactManager::CheckSat(new p2Contact(&body.GetColliders()[0], &bodyB->GetColliders()[0]));
+			if(check)
+			{
+				body.ApplyForceToCenter(body.GetLinearVelocity() * -1);
+				bodyB->ApplyForceToCenter(bodyB->GetLinearVelocity() * -1);
+			}
+		}
 	}
 }
 

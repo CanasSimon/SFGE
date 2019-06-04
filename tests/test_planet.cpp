@@ -29,27 +29,6 @@ SOFTWARE.
 #include <gtest/gtest.h>
 #include <engine/component.h>
 
-TEST(Physics, TestPlanetPySystem)
-{
-	sfge::Engine engine;
-	std::unique_ptr<sfge::Configuration> initConfig = std::make_unique<sfge::Configuration>();
-	initConfig->gravity = p2Vec2();
-	initConfig->devMode = false;
-	initConfig->maxFramerate = 0;
-	engine.Init(std::move(initConfig));
-	json sceneJson = {
-		{ "name", "Test Planet System" }
-	};
-	json systemJson = {
-		{"script_path", "scripts/planet_system.py"}
-	};
-	sceneJson["systems"] = json::array({ systemJson });
-	auto* sceneManager = engine.GetSceneManager();
-	sceneManager->LoadSceneFromJson(sceneJson);
-
-	engine.Start();
-}
-
 TEST(System, TestPlanetPySystemCpp)
 {
 	sfge::Engine engine;

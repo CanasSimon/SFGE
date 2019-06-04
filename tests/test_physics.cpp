@@ -245,19 +245,7 @@ TEST(Physics, TestShapeContactCpp)
 			{"collider_type",sfge::ColliderType::CIRCLE},
 			{"radius",25},
 			{"sensor",true}
-		}/*,
-		{
-			{"name","Poly Collider"},
-			{"type", sfge::ComponentType::COLLIDER2D},
-			{"collider_type",sfge::ColliderType::POLYGON},
-			{"points",
-				{1, 1},
-				{1, -1},
-				{-1, -1},
-				{-1, 1 }
-			},
-			{"sensor",true}
-		}*/
+		}
 	};
 
 	for (auto& entityJson : entities)
@@ -285,9 +273,6 @@ TEST(Physics, TestShapeContactCpp)
 	sceneJson["systems"] = json::array({
 			{
 				{"systemClassName", "Debug"}
-			},
-			{
-				{"script_path", "scripts/contact_debug_system.py"}
 			}
 		}
 	);

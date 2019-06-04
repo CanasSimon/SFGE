@@ -193,6 +193,7 @@ bool p2ContactManager::CheckCircleSat(p2Contact* contact)
 	const auto colliderB = contact->GetColliderB();
 
 	const auto distance = colliderA->position.GetDistance(colliderB->position);
+	contact->normal = p2Vec2::GetVectorFrom(colliderA->position, colliderB->position).Normalized();
 
 	return distance <= colliderA->GetHalfExtend().x + colliderB->GetHalfExtend().x;
 }

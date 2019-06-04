@@ -11,7 +11,7 @@ namespace sfge::ext
 {
 
 	BodyTest::BodyTest(Engine& engine) :
-		System(engine), m_Transform2DManager(), m_Body2DManager(), m_TextureManager(), m_SpriteManager(), m_Graphics2DManager()
+		System(engine), m_Transform2DManager(), m_Body2DManager(), m_Graphics2DManager()
 	{
 	}
 
@@ -19,19 +19,32 @@ namespace sfge::ext
 	{
 		m_Transform2DManager = m_Engine.GetTransform2dManager();
 		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
-		m_TextureManager = m_Engine.GetGraphics2dManager()->GetTextureManager();
-		m_SpriteManager = m_Engine.GetGraphics2dManager()->GetSpriteManager();
 		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
-
+		m_Shape2DManager = m_Graphics2DManager->GetShapeManager();
 
 		const auto config = m_Engine.GetConfig();
 		screenSize = sf::Vector2f(config->screenResolution.x, config->screenResolution.y);
 		auto* entityManager = m_Engine.GetEntityManager();
+
+		m_Entities = entityManager->GetEntitiesWithType(ComponentType::BODY2D);
+		for (auto& entity : m_Entities)
+		{
+			const auto transform = m_Transform2DManager->GetComponentPtr(entity);
+			const auto body = m_Body2DManager->GetComponentPtr(entity);
+			const auto shape = m_Shape2DManager->GetComponentPtr(entity);
+			m_Transforms.push_back(transform);
+			m_Bodies.push_back(body->GetBody());
+			m_Shapes.push_back(shape);
+		}
 	}
 
 	void BodyTest::OnUpdate(float dt)
 	{
 		(void)dt;
+		for (auto& transform : m_Transforms)
+		{
+			transform->EulerAngle += 1;
+		}
 	}
 
 

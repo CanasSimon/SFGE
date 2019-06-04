@@ -37,6 +37,9 @@ public:
 
 	p2Collider* GetColliderA() const;
 	p2Collider* GetColliderB() const;
+
+	p2Vec2 contactPoint;
+	p2Vec2 normal;
 private:
 	p2Collider* m_ColliderA = nullptr;
 	p2Collider* m_ColliderB = nullptr;

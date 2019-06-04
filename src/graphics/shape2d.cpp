@@ -63,6 +63,14 @@ void Shape::SetFillColor(sf::Color color) const
 		m_Shape->setFillColor(color);
 }
 
+sf::Color Shape::GetFillColor() const
+{
+	if (m_Shape)	
+		return m_Shape->getFillColor();
+
+	return sf::Color();
+}
+
 void Shape::Update() const
 {
 	if(m_Shape != nullptr)

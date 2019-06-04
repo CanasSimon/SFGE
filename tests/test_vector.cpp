@@ -28,20 +28,17 @@ SOFTWARE.
 #include <utility/json_utility.h>
 #include <gtest/gtest.h>
 
-TEST(Physics, TestVector)
+TEST(Vector, TestVector)
 {
     sfge::Engine engine;
     std::unique_ptr<sfge::Configuration> initConfig = std::make_unique<sfge::Configuration>();
-    initConfig->gravity = p2Vec2(0,0);
-    initConfig->devMode = false;
-    initConfig->maxFramerate = 0;
     engine.Init(std::move(initConfig));
     json sceneJson = {
             { "name", "Test Vector" }
     };
     json systemJson = {
-			{"script_path", "scripts/vector_rotation_test.py"}
-    };
+		{"systemClassName", "VectorTest"}
+	};
     sceneJson["systems"] = json::array({ systemJson });
     auto* sceneManager = engine.GetSceneManager();
     sceneManager->LoadSceneFromJson(sceneJson);

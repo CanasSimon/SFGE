@@ -33,13 +33,15 @@ namespace sfge::ext
 	private:
 		Transform2dManager* m_Transform2DManager;
 		Body2dManager* m_Body2DManager;
-		TextureManager* m_TextureManager;
-		SpriteManager* m_SpriteManager;
 		Graphics2dManager* m_Graphics2DManager;
+		ShapeManager* m_Shape2DManager;
 
 		sf::Vector2f screenSize;
-		std::vector<p2Body*> bodies;
-		std::vector<Entity> entities;
+		std::vector<Transform2d*> m_Transforms;
+		std::vector<Entity> m_Entities;
+		std::vector<p2Body*> m_Bodies;
+		std::vector<Shape*> m_Shapes;
+
 	};
 }
 

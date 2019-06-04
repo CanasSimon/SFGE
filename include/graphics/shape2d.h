@@ -56,6 +56,7 @@ public:
   	virtual ~Shape();
 	void Draw(sf::RenderWindow& window) const;
 	void SetFillColor(sf::Color color) const;
+	sf::Color GetFillColor() const;
 	void Update() const;
 	void SetShape(std::unique_ptr<sf::Shape> shape);
 	sf::Shape* GetShape();

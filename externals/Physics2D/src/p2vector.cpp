@@ -219,7 +219,7 @@ p2Vec2 p2Vec2::GetNormal() const
 
 p2Vec2 p2Vec2::GetReflection(const p2Vec2& n) const
 {
-	const auto nor = n.GetNormal().Normalized();
+	const auto nor = n.Normalized();
 	return *this - nor * 2 * Dot(*this, nor);
 }
 
