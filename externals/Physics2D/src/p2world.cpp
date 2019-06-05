@@ -50,7 +50,7 @@ void p2World::Step(const float dt)
 
 		m_QuadTree->Insert(&body);
 
-		const auto retrieve = m_QuadTree->Retrieve(&body);
+		/*const auto retrieve = m_QuadTree->Retrieve(&body);
 		for (auto& bodyB : retrieve)
 		{
 			if(&body == bodyB) continue;
@@ -60,7 +60,7 @@ void p2World::Step(const float dt)
 				body.ApplyForceToCenter(body.GetLinearVelocity() * -1);
 				bodyB->ApplyForceToCenter(bodyB->GetLinearVelocity() * -1);
 			}
-		}
+		}*/
 	}
 }
 
