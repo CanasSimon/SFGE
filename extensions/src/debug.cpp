@@ -5,6 +5,7 @@
 #include <graphics/graphics2d.h>
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
+#include "imgui.h"
 
 
 namespace sfge::ext
@@ -59,12 +60,10 @@ namespace sfge::ext
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::Q)) m_DrawQuadTree = !m_DrawQuadTree;
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::C)) m_QuadTree->Clear();
 
-		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Up)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, -1));
-		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Down)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, 1));
-		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Right)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(1, 0));
-		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Left)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(-1, 0));
-
-		m_Bodies[0]->SetLinearVelocity(m_Bodies[0]->GetLinearVelocity() / 1.2);
+		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Up)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, -.1));
+		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Down)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, .1));
+		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Right)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(.1, 0));
+		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Left)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(-.1, 0));
 
 		for (auto& body : m_Bodies)
 		{
@@ -93,13 +92,21 @@ namespace sfge::ext
 	void Debug::OnFixedUpdate()
 	{
 		rmt_ScopedCPUSample(DebugFixedUpdate, 0);
-
-		m_Transforms[0]->EulerAngle += 1;
 	}
 
 	void Debug::OnDraw()
 	{
 		rmt_ScopedCPUSample(DebugDraw, 0);
+		ImGui::Begin("Debug");
+		if (ImGui::Button("AABB / OBB")) m_DrawAabb = !m_DrawAabb;
+		if (ImGui::Button("QuadTree")) m_DrawQuadTree = !m_DrawQuadTree;
+		ImGui::End();
+
+		for (auto& contact : m_World->GetContactManager().possibleContacts)
+		{
+			m_Graphics2DManager->DrawVector(meter2pixel(-contact->mtv), Vec2f(400, 400), sf::Color::Yellow);
+			m_Graphics2DManager->DrawVector(meter2pixel(contact->mtv), Vec2f(400,400), sf::Color::Yellow);
+		}
 
 		if (m_DrawQuadTree)
 		{

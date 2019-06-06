@@ -40,7 +40,6 @@ void p2Body::Init(p2BodyDef* bodyDef)
 
 	m_Aabb.vertices.resize(4);
 	m_Aabb.edges.resize(4);
-	RebuildAabb();
 }
 
 void p2Body::RebuildAabb()
@@ -115,6 +114,7 @@ p2Collider* p2Body::CreateCollider(p2ColliderDef* colliderDef)
 {
 	auto& collider = m_Colliders[m_ColliderInitIndex];
 	collider.Init(colliderDef);
+	RebuildAabb();
 	m_ColliderInitIndex++;
 	return &collider;
 }

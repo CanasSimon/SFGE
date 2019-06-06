@@ -74,7 +74,7 @@ public:
 private:
 	p2Aabb m_Aabb;
 	void* m_UserData = nullptr;
-	p2Shape* m_Shape{};
+	p2Shape* m_Shape = nullptr;
 	p2ColliderType m_ColliderType = p2ColliderType::NONE;
 	p2ColliderDef m_ColliderDefinition;
 	p2Vec2 m_HalfExtend = p2Vec2(0, 0);

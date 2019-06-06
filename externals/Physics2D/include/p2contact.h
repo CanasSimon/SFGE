@@ -39,6 +39,7 @@ public:
 	p2Collider* GetColliderB() const;
 
 	p2Vec2 contactPoint;
+	p2Vec2 mtv;
 	p2Vec2 normal;
 private:
 	p2Collider* m_ColliderA = nullptr;
@@ -61,7 +62,7 @@ public:
 class p2ContactManager
 {
 public:
-	void TestContacts(const p2Body& bodyA, const p2Body& bodyB);
+	void TestContacts(p2Body& bodyA, p2Body& bodyB);
 	int CheckContact(p2Contact contact);
 
 	static bool CheckSat(p2Contact* contact);
@@ -69,8 +70,7 @@ public:
 	static bool CheckCircleSat(p2Contact* contact);
 	static bool CheckCircleBoxSat(p2Contact* contact);
 
-	std::vector<p2Contact> GetContacts() const;
-	std::vector<p2Contact> possibleContacts;
+	std::vector<p2Contact*> possibleContacts;
 
 	p2ContactListener* contactListener;
 };
