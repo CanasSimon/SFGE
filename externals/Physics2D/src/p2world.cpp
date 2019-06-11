@@ -49,15 +49,19 @@ void p2World::Step(const float dt)
 		}
 
 		m_QuadTree->Insert(&body);
-	}
 
-	/*if (check)
-	{s
-		const auto normal = p2Vec2(0, 1).Rotate(m_Bodies[1].GetRotation());
-		m_Bodies[0].ApplyForceToCenter(m_Bodies[0].GetLinearVelocity().GetReflection(normal));
-		m_Bodies[1].ApplyForceToCenter(m_Bodies[1].GetLinearVelocity().GetReflection(normal));
-	}*/
-	m_ContactManager.TestContacts(m_Bodies[0], m_Bodies[1]);
+		/*const auto retrieve = m_QuadTree->Retrieve(&body);
+		for (auto& bodyB : retrieve)
+		{
+			if(&body == bodyB) continue;
+			const auto check = p2ContactManager::CheckSat(new p2Contact(&body.GetColliders()[0], &bodyB->GetColliders()[0]));
+			if(check)
+			{
+				body.ApplyForceToCenter(body.GetLinearVelocity() * -1);
+				bodyB->ApplyForceToCenter(bodyB->GetLinearVelocity() * -1);
+			}
+		}*/
+	}
 }
 
 p2Body* p2World::CreateBody(p2BodyDef* bodyDef)

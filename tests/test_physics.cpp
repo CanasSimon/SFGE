@@ -32,8 +32,6 @@ TEST(Physics, TestBallFallingToGround)
 	sfge::Engine engine;
 	auto config = std::make_unique<sfge::Configuration>();
 	config->devMode = false;
-	config->gravity = p2Vec2(0, 9.81);
-	config->maxFramerate = 0;
 	engine.Init(std::move(config));
 
 	auto* sceneManager = engine.GetSceneManager();
@@ -98,7 +96,7 @@ TEST(Physics, TestBallFallingToGround)
 	rectColliderJson["size"] = {800,200};
 	rectColliderJson["sensor"] = false;
 
-	entityBody2["components"] = { transformJson2, circleShapeJson, rigidBodyJson2, circleColliderJson };
+	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };
 
 	sceneJson["entities"] = { entityBody1, entityBody2 };
 	sceneJson["systems"] = json::array({

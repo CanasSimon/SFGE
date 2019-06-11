@@ -105,11 +105,6 @@ p2Vec2 p2Vec2::operator-(const p2Vec2& v) const
 	return {x - v.x, y - v.y};
 }
 
-p2Vec2 p2Vec2::operator-() const
-{
-	return { -x, -y };
-}
-
 p2Vec2& p2Vec2::operator-=(const p2Vec2& v)
 {
 	x -= v.x;

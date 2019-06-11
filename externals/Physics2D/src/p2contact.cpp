@@ -41,37 +41,17 @@ p2Collider* p2Contact::GetColliderB() const
 	return m_ColliderB;
 }
 
-void p2ContactManager::TestContacts(p2Body& bodyA, p2Body& bodyB)
+void p2ContactManager::TestContacts(const p2Body& bodyA, const p2Body& bodyB)
 {
-	auto colliderA = bodyA.GetColliders()[0];
-	auto colliderB = bodyB.GetColliders()[0];
-	const auto contact = new p2Contact(&colliderA, &colliderB);
+	const auto contact = new p2Contact(&bodyA.GetColliders()[0], &bodyB.GetColliders()[0]);
 	const auto index = CheckContact(*contact);
-	contact->normal = p2Vec2(0, 1).Rotate(bodyB.GetRotation());
-
-	const auto velocityA = bodyA.GetLinearVelocity().GetReflection(contact->normal);
-	const auto velocityB = bodyB.GetLinearVelocity().GetReflection(contact->normal);
-
-	const auto friction = 0.8;
-	const auto bounce = 0.8;
 
 	if(index == -1)
 	{
 		if (CheckSat(contact))
 		{
 			contactListener->AddContact(contact);
-			possibleContacts.push_back(contact);
-
-			if(bodyA.GetType() != p2BodyType::STATIC)
-			{
-				bodyA.SetLinearVelocity(p2Vec2(velocityA.x * friction, velocityA.y * bounce));
-				bodyA.Offset(-contact->mtv);
-			}
-			if (bodyB.GetType() != p2BodyType::STATIC)
-			{
-				bodyB.SetLinearVelocity(p2Vec2(velocityB.x * friction, velocityB.y * bounce));
-				bodyB.Offset(contact->mtv);
-			}
+			possibleContacts.push_back(*contact);
 		}
 	}
 	else
@@ -81,19 +61,6 @@ void p2ContactManager::TestContacts(p2Body& bodyA, p2Body& bodyB)
 			contactListener->DeleteContact(contact);
 			possibleContacts.erase(possibleContacts.begin() + index);
 		}
-		else
-		{
-			if (bodyA.GetType() != p2BodyType::STATIC)
-			{
-				bodyA.SetLinearVelocity(p2Vec2(velocityA.x * friction, velocityA.y * bounce));
-				bodyA.Offset(-contact->mtv);
-			}
-			if (bodyB.GetType() != p2BodyType::STATIC)
-			{
-				bodyB.SetLinearVelocity(p2Vec2(velocityB.x * friction, velocityB.y * bounce));
-				bodyB.Offset(contact->mtv);
-			}
-		}
 	}
 }
 
@@ -101,10 +68,10 @@ int p2ContactManager::CheckContact(p2Contact contact)
 {
 	for (auto i = 0u; i < possibleContacts.size(); ++i)
 	{
-		if (possibleContacts[i]->GetColliderA() == contact.GetColliderA() && 
-			possibleContacts[i]->GetColliderB() == contact.GetColliderB() || 
-			possibleContacts[i]->GetColliderA() == contact.GetColliderB() &&
-			possibleContacts[i]->GetColliderB() == contact.GetColliderA()) return i;
+		if (possibleContacts[i].GetColliderA() == contact.GetColliderA() && 
+			possibleContacts[i].GetColliderB() == contact.GetColliderB() || 
+			possibleContacts[i].GetColliderA() == contact.GetColliderB() &&
+			possibleContacts[i].GetColliderB() == contact.GetColliderA()) return i;
 	}
 
 	return -1;
@@ -227,9 +194,6 @@ bool p2ContactManager::CheckCircleSat(p2Contact* contact)
 
 	const auto distance = colliderA->position.GetDistance(colliderB->position);
 	contact->normal = p2Vec2::GetVectorFrom(colliderA->position, colliderB->position).Normalized();
-	const auto vector1 = p2Vec2::GetVectorFrom(colliderA->position, colliderA->position + p2Vec2(colliderA->GetHalfExtend().x, 0));
-	const auto vector2 = p2Vec2::GetVectorFrom(colliderB->position, colliderB->position + p2Vec2(colliderB->GetHalfExtend().x, 0));
-	contact->mtv = contact->normal * (colliderA->GetHalfExtend().x + colliderB->GetHalfExtend().x - distance);
 
 	return distance <= colliderA->GetHalfExtend().x + colliderB->GetHalfExtend().x;
 }
@@ -275,15 +239,11 @@ InZone:
 			if (proj > bMaxProj) bMaxProj = proj;
 		}
 
-		//contact->mtv = vector2 - vector1;
-
 		if (aMaxProj < bMinProj || bMaxProj < aMinProj)
 		{
 			return false;
 		}
 	}
-
-	contact->normal = aabbB.edges[0].GetNormal().Normalized();
 
 	return true;
 
@@ -294,11 +254,13 @@ NotInZone:
 		if (vertex.GetDistance(aabbA.GetCenter()) < dist)
 		{
 			dist = vertex.GetDistance(aabbA.GetCenter());
-			const auto vector1 = p2Vec2::GetVectorFrom(aabbA.GetCenter(), vertex);
-			const auto vector2 = p2Vec2::GetVectorFrom(aabbA.GetCenter(), vertex).Normalized() * colliderA->GetHalfExtend().x;
-			contact->mtv = vector2 - vector1;
-			contact->normal = vector1.Normalized();
 		}
 	}
+
 	return dist < colliderA->GetHalfExtend().x;
+}
+
+std::vector<p2Contact> p2ContactManager::GetContacts() const
+{
+	return possibleContacts;
 }
