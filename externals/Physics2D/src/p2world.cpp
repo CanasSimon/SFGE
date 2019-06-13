@@ -42,22 +42,22 @@ void p2World::Step(const float dt)
 
 	for (auto& body : m_Bodies)
 	{
+		if (body.GetType() == p2BodyType::NONE) continue;
+
+		m_QuadTree->Insert(&body);
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
 			body.Offset(body.GetLinearVelocity() * dt);
 			body.ApplyForceToCenter(m_Gravity * dt);
 		}
 
-		m_QuadTree->Insert(&body);
+		const auto retrieve = m_QuadTree->Retrieve(&body);
+		for (auto& bodyB : retrieve)
+		{
+			if (&body == bodyB) continue;
+			m_ContactManager.TestContacts(body, *bodyB);
+		}
 	}
-
-	/*if (check)
-	{s
-		const auto normal = p2Vec2(0, 1).Rotate(m_Bodies[1].GetRotation());
-		m_Bodies[0].ApplyForceToCenter(m_Bodies[0].GetLinearVelocity().GetReflection(normal));
-		m_Bodies[1].ApplyForceToCenter(m_Bodies[1].GetLinearVelocity().GetReflection(normal));
-	}*/
-	m_ContactManager.TestContacts(m_Bodies[0], m_Bodies[1]);
 }
 
 p2Body* p2World::CreateBody(p2BodyDef* bodyDef)

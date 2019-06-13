@@ -104,7 +104,7 @@ namespace sfge::ext
 
 		for (auto& contact : m_World->GetContactManager().possibleContacts)
 		{
-			m_Graphics2DManager->DrawVector(meter2pixel(-contact->mtv), Vec2f(400, 400), sf::Color::Yellow);
+			m_Graphics2DManager->DrawVector(meter2pixel(contact->normal), Vec2f(400, 400), sf::Color::White);
 			m_Graphics2DManager->DrawVector(meter2pixel(contact->mtv), Vec2f(400,400), sf::Color::Yellow);
 		}
 

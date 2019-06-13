@@ -71,6 +71,10 @@ public:
 
 	p2Vec2 position;
 	p2Vec2 offset = {0, 0};
+
+	float restitution = 0;
+	float bounce = 1;
+	float friction = 1;
 private:
 	p2Aabb m_Aabb;
 	void* m_UserData = nullptr;

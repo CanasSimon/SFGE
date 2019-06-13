@@ -34,6 +34,7 @@ struct p2ColliderDef;
 
 enum class p2BodyType
 {
+	NONE,
 	STATIC,
 	KINEMATIC,
 	DYNAMIC
@@ -91,7 +92,7 @@ private:
 	p2Vec2 m_LinearVelocity = {0, 0};
 	float m_AngularVelocity = 0;
 	float m_Mass = 1;
-	p2BodyType m_Type = p2BodyType::STATIC;
+	p2BodyType m_Type = p2BodyType::NONE;
 
 	int m_MaxColliderCount = 4;
 	int m_ColliderInitIndex = 0;

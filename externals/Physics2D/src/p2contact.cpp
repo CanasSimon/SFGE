@@ -25,6 +25,11 @@ SOFTWARE.
 #include <p2contact.h>
 #include <iostream>
 
+/**
+ * \brief Default Constructor
+ * \param colliderA first collider of contact
+ * \param colliderB second collider of contact
+ */
 p2Contact::p2Contact(p2Collider* colliderA, p2Collider* colliderB)
 {
 	m_ColliderA = colliderA;
@@ -41,62 +46,48 @@ p2Collider* p2Contact::GetColliderB() const
 	return m_ColliderB;
 }
 
+/**
+ * \brief Check if contact needs to be created, updated or deleted
+ * \param bodyA first body to test contacts with
+ * \param bodyB second body to test contacts with
+ */
 void p2ContactManager::TestContacts(p2Body& bodyA, p2Body& bodyB)
 {
 	auto colliderA = bodyA.GetColliders()[0];
 	auto colliderB = bodyB.GetColliders()[0];
 	const auto contact = new p2Contact(&colliderA, &colliderB);
+
 	const auto index = CheckContact(*contact);
-	contact->normal = p2Vec2(0, 1).Rotate(bodyB.GetRotation());
 
-	const auto velocityA = bodyA.GetLinearVelocity().GetReflection(contact->normal);
-	const auto velocityB = bodyB.GetLinearVelocity().GetReflection(contact->normal);
-
-	const auto friction = 0.8;
-	const auto bounce = 0.8;
-
-	if(index == -1)
+	if (index == -1)
 	{
 		if (CheckSat(contact))
 		{
-			contactListener->AddContact(contact);
-			possibleContacts.push_back(contact);
-
-			if(bodyA.GetType() != p2BodyType::STATIC)
-			{
-				bodyA.SetLinearVelocity(p2Vec2(velocityA.x * friction, velocityA.y * bounce));
-				bodyA.Offset(-contact->mtv);
-			}
-			if (bodyB.GetType() != p2BodyType::STATIC)
-			{
-				bodyB.SetLinearVelocity(p2Vec2(velocityB.x * friction, velocityB.y * bounce));
-				bodyB.Offset(contact->mtv);
-			}
+			CorrectPositions(bodyA, bodyB, contact);
 		}
 	}
 	else
 	{
-		if (!CheckSat(contact))
+		if (!p2Aabb::DoOverlapWith(bodyA.GetAabb(), bodyB.GetAabb()) || !CheckSat(contact))
 		{
 			contactListener->DeleteContact(contact);
 			possibleContacts.erase(possibleContacts.begin() + index);
+			delete contact;
 		}
 		else
 		{
-			if (bodyA.GetType() != p2BodyType::STATIC)
-			{
-				bodyA.SetLinearVelocity(p2Vec2(velocityA.x * friction, velocityA.y * bounce));
-				bodyA.Offset(-contact->mtv);
-			}
-			if (bodyB.GetType() != p2BodyType::STATIC)
-			{
-				bodyB.SetLinearVelocity(p2Vec2(velocityB.x * friction, velocityB.y * bounce));
-				bodyB.Offset(contact->mtv);
-			}
+			possibleContacts[index] = contact;
+
+			CorrectPositions(bodyA, bodyB, contact);
 		}
 	}
 }
 
+/**
+ * \brief Check whether contact already exists or not
+ * \param contact the contact to be checked
+ * \return Contact index in possibleContacts if contact exist, -1 if not
+ */
 int p2ContactManager::CheckContact(p2Contact contact)
 {
 	for (auto i = 0u; i < possibleContacts.size(); ++i)
@@ -110,6 +101,40 @@ int p2ContactManager::CheckContact(p2Contact contact)
 	return -1;
 }
 
+void p2ContactManager::CorrectPositions(p2Body& bodyA, p2Body& bodyB, p2Contact* contact)
+{
+	const auto colliderA = bodyA.GetColliders()[0];
+	const auto colliderB = bodyB.GetColliders()[0];
+
+	const auto velocityA = bodyA.GetLinearVelocity();
+	const auto velocityB = bodyB.GetLinearVelocity();
+
+	contactListener->AddContact(contact);
+	possibleContacts.push_back(contact);
+
+	if (bodyA.GetType() != p2BodyType::STATIC)
+	{
+		bodyA.SetLinearVelocity(
+			velocityB * colliderB.restitution + p2Vec2(velocityA.x * colliderA.friction, velocityA.y * colliderA.bounce).
+			GetReflection(contact->normal) * (1 - colliderB.restitution));
+
+		bodyA.Offset(-contact->mtv);
+	}
+	if (bodyB.GetType() != p2BodyType::STATIC)
+	{
+		bodyB.SetLinearVelocity(
+			velocityA * colliderA.restitution + p2Vec2(velocityB.x * colliderB.friction, velocityB.y * colliderB.bounce).
+			GetReflection(contact->normal) * (1 - colliderA.restitution));
+
+		bodyB.Offset(contact->mtv);
+	}
+}
+
+/**
+ * \brief Check which type of SAT to call for the colliders
+ * \param contact the contact to check
+ * \return if the colliders have a contact
+ */
 bool p2ContactManager::CheckSat(p2Contact* contact)
 {
 	const auto colliderA = contact->GetColliderA();
@@ -123,7 +148,7 @@ bool p2ContactManager::CheckSat(p2Contact* contact)
 		case p2ColliderType::CIRCLE:
 			return CheckCircleSat(contact);
 		case p2ColliderType::RECT:
-			return CheckCircleBoxSat(contact);
+			return CheckCircleRectSat(contact);
 		default:
 			return false;
 		}
@@ -131,9 +156,9 @@ bool p2ContactManager::CheckSat(p2Contact* contact)
 		switch (colliderB->GetType())
 		{
 		case p2ColliderType::CIRCLE:
-			return CheckCircleBoxSat(contact);
+			return CheckCircleRectSat(contact);
 		case p2ColliderType::RECT:
-			return CheckBoxSat(contact);
+			return CheckRectSat(contact);
 		default:
 			return false;
 		}
@@ -142,7 +167,12 @@ bool p2ContactManager::CheckSat(p2Contact* contact)
 	}
 }
 
-bool p2ContactManager::CheckBoxSat(p2Contact* contact)
+/**
+ * \brief Check SAT between two rect
+ * \param contact the contact to check
+ * \return if the colliders have a contact
+ */
+bool p2ContactManager::CheckRectSat(p2Contact* contact)
 {
 	//Code edited from https://gist.github.com/nyorain/dc5af42c6e83f7ac6d831a2cfd5fbece
 
@@ -217,9 +247,36 @@ bool p2ContactManager::CheckBoxSat(p2Contact* contact)
 		if (aMaxProj < bMinProj || bMaxProj < aMinProj) return false;
 	}
 
+	p2Aabb minkowski;
+	minkowski.topRight = aabbA.topRight - aabbB.bottomLeft;
+	minkowski.bottomLeft = aabbA.bottomLeft - aabbB.topRight;
+
+	auto min = std::numeric_limits<float>::infinity();
+	if (abs(minkowski.bottomLeft.x) < min) {
+		min = abs(minkowski.bottomLeft.x);
+		contact->mtv = p2Vec2(minkowski.bottomLeft.x, 0.f);
+	}
+	if (abs(minkowski.topRight.x) < min) {
+		min = abs(minkowski.topRight.x);
+		contact->mtv = p2Vec2(minkowski.topRight.x, 0.f);
+	}
+	if (abs(minkowski.topRight.y) < min) {
+		min = abs(minkowski.topRight.y);
+		contact->mtv = p2Vec2(0.f, minkowski.topRight.y);
+	}
+	if (abs(minkowski.bottomLeft.y) < min) {
+		min = abs(minkowski.bottomLeft.y);
+		contact->mtv = p2Vec2(0.f, minkowski.bottomLeft.y);
+	}
+
 	return true;
 }
 
+/**
+ * \brief Check SAT between two circles
+ * \param contact the contact to check
+ * \return if the colliders have a contact
+ */
 bool p2ContactManager::CheckCircleSat(p2Contact* contact)
 {
 	const auto colliderA = contact->GetColliderA();
@@ -234,7 +291,12 @@ bool p2ContactManager::CheckCircleSat(p2Contact* contact)
 	return distance <= colliderA->GetHalfExtend().x + colliderB->GetHalfExtend().x;
 }
 
-bool p2ContactManager::CheckCircleBoxSat(p2Contact* contact)
+/**
+ * \brief Check SAT between a circle and a rect
+ * \param contact the contact to check
+ * \return if the colliders have a contact
+ */
+bool p2ContactManager::CheckCircleRectSat(p2Contact* contact)
 {
 	auto colliderA = contact->GetColliderA();
 	auto colliderB = contact->GetColliderB();

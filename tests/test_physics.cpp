@@ -69,8 +69,6 @@ TEST(Physics, TestBallFallingToGround)
 	circleColliderJson["bouncing"] = 0.5;
 	circleColliderJson["sensor"] = false;
 
-	entityBody1["components"] = { transformJson1, circleShapeJson, rigidBodyJson1, circleColliderJson };
-
 	json entityBody2;
 	entityBody2["name"] = "Ground";
 
@@ -84,7 +82,7 @@ TEST(Physics, TestBallFallingToGround)
 	rectShapeJson["name"] = "Rect Shape Component";
 	rectShapeJson["type"] = sfge::ComponentType::SHAPE2D;
 	rectShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
-	rectShapeJson["size"] = {800,200};
+	rectShapeJson["size"] = {200,200};
 
 	json rigidBodyJson2;
 	rigidBodyJson2["name"] = "Rigidbody";
@@ -95,10 +93,11 @@ TEST(Physics, TestBallFallingToGround)
 	rectColliderJson["name"] = "Rect Collider";
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
-	rectColliderJson["size"] = {800,200};
+	rectColliderJson["size"] = {200,200};
 	rectColliderJson["sensor"] = false;
 
-	entityBody2["components"] = { transformJson2, circleShapeJson, rigidBodyJson2, circleColliderJson };
+	entityBody1["components"] = { transformJson1, rectShapeJson, rigidBodyJson1, rectColliderJson };
+	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };
 
 	sceneJson["entities"] = { entityBody1, entityBody2 };
 	sceneJson["systems"] = json::array({
