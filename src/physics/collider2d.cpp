@@ -145,10 +145,20 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 
 			fixtureDef.colliderType = static_cast<p2ColliderType>(componentJson["collider_type"]);
 		}
-		if(CheckJsonNumber(componentJson, "bouncing"))
+
+		if(CheckJsonNumber(componentJson, "restitution"))
 		{
-			fixtureDef.restitution = componentJson["bouncing"];
+			fixtureDef.restitution = componentJson["restitution"];
 		}
+		if (CheckJsonNumber(componentJson, "bounce"))
+		{
+			fixtureDef.bounce = componentJson["bounce"];
+		}
+		if (CheckJsonNumber(componentJson, "friction"))
+		{
+			fixtureDef.friction = componentJson["friction"];
+		}
+
 		if (CheckJsonExists(componentJson, "offset"))
 		{
 			fixtureDef.offset = pixel2meter(GetVectorFromJson(componentJson, "offset"));

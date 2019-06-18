@@ -11,6 +11,9 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 	offset = colliderDef->offset;
 	m_ColliderType = colliderDef->colliderType;
 	m_ColliderDefinition = *colliderDef;
+	restitution = colliderDef->restitution;
+	bounce = colliderDef->bounce;
+	friction = colliderDef->friction;
 
 	std::cout << m_Shape->type << "\n";
 

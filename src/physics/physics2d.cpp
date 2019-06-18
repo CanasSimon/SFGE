@@ -56,7 +56,7 @@ void Physics2dManager::OnFixedUpdate()
 	const auto config = m_Engine.GetConfig();
 	if (config != nullptr and m_World != nullptr)
 	{
-		m_World->Step(config->fixedDeltaTime);
+		m_World->Step(config->fixedDeltaTime * m_World->timeScale);
 		m_BodyManager.OnFixedUpdate();
 	}
 }

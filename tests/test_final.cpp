@@ -126,7 +126,7 @@ TEST(Final, TestShapeContactCpp)
 	json sceneJson;
 	sceneJson["name"] = "Contacts";
 
-	const auto entitiesNmb = 256;
+	const auto entitiesNmb = 16;
 	json entities[entitiesNmb];
 
 	json shapes[] =

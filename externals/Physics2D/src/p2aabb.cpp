@@ -46,8 +46,8 @@ bool p2Aabb::DoContain(const p2Vec2 position) const
 
 bool p2Aabb::DoOverlapWith(const p2Aabb aabbA, const p2Aabb aabbB)
 {
-	return aabbA.bottomLeft.x < aabbB.topRight.x && aabbA.topRight.x > aabbB.bottomLeft.x &&
-		aabbA.topRight.y > aabbB.bottomLeft.y && aabbA.bottomLeft.y < aabbB.topRight.y;
+	return aabbA.bottomLeft.x <= aabbB.topRight.x && aabbA.topRight.x >= aabbB.bottomLeft.x &&
+		aabbA.topRight.y >= aabbB.bottomLeft.y && aabbA.bottomLeft.y <= aabbB.topRight.y;
 }
 
 /*bool p2Aabb::DoOverlapWith(p2Contact contact)

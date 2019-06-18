@@ -46,9 +46,12 @@ struct p2ColliderDef
 	p2Shape* shape{};
 	p2Vec2 position;
 	p2Vec2 offset = { 0, 0 };
-	float restitution = 1;
 	bool isSensor = false;
 	p2ColliderType colliderType = p2ColliderType::NONE;
+
+	float restitution = 1;
+	float bounce = 1;
+	float friction = 1;
 };
 
 /**
@@ -73,8 +76,8 @@ public:
 	p2Vec2 offset = {0, 0};
 
 	float restitution = 0;
-	float bounce = 1;
-	float friction = 1;
+	float bounce = 0;
+	float friction = 0;
 private:
 	p2Aabb m_Aabb;
 	void* m_UserData = nullptr;

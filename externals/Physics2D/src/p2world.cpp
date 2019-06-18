@@ -50,13 +50,26 @@ void p2World::Step(const float dt)
 			body.Offset(body.GetLinearVelocity() * dt);
 			body.ApplyForceToCenter(m_Gravity * dt);
 		}
+	}
 
-		const auto retrieve = m_QuadTree->Retrieve(&body);
+	/*for (auto& bodyA : m_Bodies)
+	{
+		if (bodyA.GetType() == p2BodyType::NONE) continue;
+
+		const auto retrieve = m_QuadTree->Retrieve(&bodyA);
 		for (auto& bodyB : retrieve)
 		{
-			if (&body == bodyB) continue;
-			m_ContactManager.TestContacts(body, *bodyB);
+			if (&bodyA == bodyB) continue;
+			m_ContactManager.TestContacts(bodyA, *bodyB);
 		}
+	}*/
+
+	m_ContactManager.TestContacts(m_Bodies[0], m_Bodies[1]);
+	//m_Bodies[0].ApplyForceToCenter(m_Gravity * dt);
+
+	for (auto& contact : m_ContactManager.contacts)
+	{
+		contact->isAlreadyUpdated = false;
 	}
 }
 

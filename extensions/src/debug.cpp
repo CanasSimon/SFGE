@@ -58,7 +58,10 @@ namespace sfge::ext
 
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::A)) m_DrawAabb = !m_DrawAabb;
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::Q)) m_DrawQuadTree = !m_DrawQuadTree;
-		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::C)) m_QuadTree->Clear();
+		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::F)) {
+			m_FrameByFrame = !m_FrameByFrame;
+			m_FrameByFrame ? m_World->timeScale = 0.01 : m_World->timeScale = 1;
+		}
 
 		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Up)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, -.1));
 		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Down)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, .1));
@@ -100,10 +103,16 @@ namespace sfge::ext
 		ImGui::Begin("Debug");
 		if (ImGui::Button("AABB / OBB")) m_DrawAabb = !m_DrawAabb;
 		if (ImGui::Button("QuadTree")) m_DrawQuadTree = !m_DrawQuadTree;
+		if (ImGui::Button("Frame by Frame")) {
+			m_FrameByFrame = !m_FrameByFrame;
+			m_FrameByFrame ? m_World->timeScale = 0.01 : m_World->timeScale = 1;
+		}
 		ImGui::End();
 
-		for (auto& contact : m_World->GetContactManager().possibleContacts)
+		for (auto& contact : m_World->GetContactManager().contacts)
 		{
+			m_Graphics2DManager->DrawLine(meter2pixel(contact->GetColliderA()->position),
+				meter2pixel(contact->GetColliderB()->position), sf::Color::White);
 			m_Graphics2DManager->DrawVector(meter2pixel(contact->normal), Vec2f(400, 400), sf::Color::White);
 			m_Graphics2DManager->DrawVector(meter2pixel(contact->mtv), Vec2f(400,400), sf::Color::Yellow);
 		}
@@ -120,7 +129,7 @@ namespace sfge::ext
 				DrawAabb(body->GetAabb(), sf::Color::Red);
 				for (auto& collider : body->GetColliders())
 				{
-					DrawAabb(collider.GetAabb(), sf::Color::Green);
+					DrawAabb(collider.GetAabb(), sf::Color::White);
 				}
 			}
 		}

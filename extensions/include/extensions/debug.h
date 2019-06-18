@@ -54,6 +54,7 @@ namespace sfge::ext
 		std::vector<p2Body*> m_Bodies;
 		std::vector<Shape*> m_Shapes;
 
+		bool m_FrameByFrame = false;
 		bool m_DrawAabb = false;
 		bool m_DrawQuadTree = false;
 	};

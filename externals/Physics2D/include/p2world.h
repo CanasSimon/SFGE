@@ -55,6 +55,7 @@ public:
 	p2ContactManager GetContactManager() const;
 
 	p2QuadTree * GetQuadTree() const;
+	float timeScale = 1;
 private:
 
 	p2Vec2 m_Gravity;

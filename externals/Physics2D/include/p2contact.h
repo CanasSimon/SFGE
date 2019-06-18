@@ -41,6 +41,8 @@ public:
 	p2Vec2 contactPoint = p2Vec2(0, 0);
 	p2Vec2 mtv = p2Vec2(0, 0);
 	p2Vec2 normal = p2Vec2(0, -1);
+
+	bool isAlreadyUpdated = false;
 private:
 	p2Collider* m_ColliderA = nullptr;
 	p2Collider* m_ColliderB = nullptr;
@@ -64,14 +66,16 @@ class p2ContactManager
 public:
 	void TestContacts(p2Body& bodyA, p2Body& bodyB);
 	int CheckContact(p2Contact contact);
-	void CorrectPositions(p2Body& bodyA, p2Body& bodyB, p2Contact* contact);
+	static void CorrectPositions(p2Body& bodyA, p2Body& bodyB, p2Contact* contact);
 
 	static bool CheckSat(p2Contact* contact);
 	static bool CheckRectSat(p2Contact* contact);
 	static bool CheckCircleSat(p2Contact* contact);
 	static bool CheckCircleRectSat(p2Contact* contact);
 
-	std::vector<p2Contact*> possibleContacts;
+	static p2Vec2 CheckMinkowskiDifference(p2Aabb rect1, p2Aabb rect2);
+
+	std::vector<p2Contact*> contacts;
 
 	p2ContactListener* contactListener;
 };
