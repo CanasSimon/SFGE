@@ -42,6 +42,7 @@ namespace sfge::ext
 
 		InputManager* m_InputManager;
 		KeyboardManager* m_KeyboardManager;
+		MouseManager* m_MouseManager;
 
 		void DrawAabb(p2Aabb aabb, sf::Color color) const;
 		void DrawQuadTree(p2QuadTree * quadTree, sf::Color color) const;
@@ -53,6 +54,8 @@ namespace sfge::ext
 		std::vector<Entity> m_Entities;
 		std::vector<p2Body*> m_Bodies;
 		std::vector<Shape*> m_Shapes;
+
+		p2Body* m_HeldBody = nullptr;
 
 		bool m_FrameByFrame = false;
 		bool m_DrawAabb = false;

@@ -30,8 +30,6 @@ SOFTWARE.
 #include <SFML/Audio.hpp>
 #include "graphics/shape2d.h"
 #include "physics/collider2d.h"
-#include <corecrt_math_defines.h>
-#include "physics/physics2d.h"
 
 TEST(Final, TestVector)
 {
@@ -591,72 +589,6 @@ TEST(Final, NewtonPendulumDecreasing)
 	sceneJson["systems"] = json::array({
 		{{"script_path", "scripts/contact_debug_system.py"}},
 		{{"systemClassName", "Debug"}} });
-
-	sceneManager->LoadSceneFromJson(sceneJson);
-	engine.Start();
-}
-
-TEST(Final, ExplosionTest)
-{
-	sfge::Engine engine;
-	auto config = std::make_unique<sfge::Configuration>();
-	config->devMode = false;
-	config->gravity = p2Vec2(0, 0);
-	config->maxFramerate = 0;
-	engine.Init(std::move(config));
-
-	auto* sceneManager = engine.GetSceneManager();
-
-	json sceneJson;
-	sceneJson["name"] = "Ball Falling To Ground";
-
-	const auto entitiesNmb = 8;
-	json entities[entitiesNmb];
-
-	entities[0]["name"] = "Ball1";
-
-	json circleShapeJson1 = {
-		{"name", "Circle Shape Component"},
-		{"type", sfge::ComponentType::SHAPE2D},
-		{"shape_type", sfge::ShapeType::CIRCLE},
-		{"radius", 50}
-	};
-	json circleColliderJson1 = {
-		{"name", "Circle Collider"},
-		{"type", sfge::ComponentType::COLLIDER2D},
-		{"collider_type", sfge::ColliderType::CIRCLE},
-		{"radius", 50},
-		{"restitution", 1},
-		{"bounce", 0},
-		{"friction", 0}
-	};
-
-	json rigidBodyJson1 = {
-		{"name", "Rigidbody"},
-		{"type", sfge::ComponentType::BODY2D},
-		{"body_type", p2BodyType::DYNAMIC}
-	};
-
-	for (auto i = 0u; i < entitiesNmb; ++i)
-	{
-		entities[i]["name"] = "Ball" + std::to_string(i + 1);
-		const auto position = p2Vec2(6.5, 3.5);
-		auto positionX = sfge::meter2pixel(position.x + p2Vec2(0, 2).Rotate(45 * i).x);
-		auto positionY = sfge::meter2pixel(position.y + p2Vec2(0, 2).Rotate(45 * i).y);
-		json transform = {
-			{"type", sfge::ComponentType::TRANSFORM2D},
-			{"position", {positionX, positionY}},
-			{"scale", {1.0, 1.0}}
-		};
-
-		entities[i]["components"] = { transform, circleShapeJson1, rigidBodyJson1, circleColliderJson1 };
-	}
-
-	sceneJson["entities"] = entities;
-	sceneJson["systems"] = json::array({
-		{{"script_path", "scripts/contact_debug_system.py"}},
-		{{"systemClassName", "Debug"}} ,
-		{{"systemClassName", "Explosion"}} });
 
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();

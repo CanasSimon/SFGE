@@ -38,23 +38,9 @@ p2World::p2World(const p2Vec2& gravity): m_Gravity(gravity), m_ContactListener()
 
 void p2World::Step(const float dt)
 {
-	m_QuadTree->Clear();
-
-	for (auto& body : m_Bodies)
+	for (auto& bodyA : m_Bodies)
 	{
-		if (body.GetType() == p2BodyType::NONE) continue;
-
-		m_QuadTree->Insert(&body);
-		if (body.GetType() == p2BodyType::DYNAMIC)
-		{
-			body.Offset(body.GetLinearVelocity() * dt);
-			body.ApplyForceToCenter(m_Gravity * dt);
-		}
-	}
-
-	/*for (auto& bodyA : m_Bodies)
-	{
-		if (bodyA.GetType() == p2BodyType::NONE) continue;
+		if (bodyA.GetType() == p2BodyType::NONE || bodyA.GetType() == p2BodyType::KINEMATIC) continue;
 
 		const auto retrieve = m_QuadTree->Retrieve(&bodyA);
 		for (auto& bodyB : retrieve)
@@ -62,10 +48,21 @@ void p2World::Step(const float dt)
 			if (&bodyA == bodyB) continue;
 			m_ContactManager.TestContacts(bodyA, *bodyB);
 		}
-	}*/
+	}
 
-	m_ContactManager.TestContacts(m_Bodies[0], m_Bodies[1]);
-	//m_Bodies[0].ApplyForceToCenter(m_Gravity * dt);
+	m_QuadTree->Clear();
+
+	for (auto& bodyA : m_Bodies)
+	{
+		if (bodyA.GetType() == p2BodyType::NONE) continue;
+
+		m_QuadTree->Insert(&bodyA);
+		if (bodyA.GetType() == p2BodyType::DYNAMIC || bodyA.GetType() == p2BodyType::KINEMATIC)
+		{
+			bodyA.Offset(bodyA.GetLinearVelocity() * dt);
+			if (bodyA.GetType() == p2BodyType::DYNAMIC) bodyA.ApplyForceToCenter(m_Gravity * dt);
+		}
+	}
 
 	for (auto& contact : m_ContactManager.contacts)
 	{

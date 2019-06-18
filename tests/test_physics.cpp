@@ -32,7 +32,7 @@ TEST(Physics, TestBallFallingToGround)
 	sfge::Engine engine;
 	auto config = std::make_unique<sfge::Configuration>();
 	config->devMode = false;
-	config->gravity = p2Vec2(0, 9.81);
+	config->gravity = p2Vec2(0, 0);
 	config->maxFramerate = 0;
 	engine.Init(std::move(config));
 
@@ -65,9 +65,10 @@ TEST(Physics, TestBallFallingToGround)
 		{"type", sfge::ComponentType::COLLIDER2D},
 		{"collider_type", sfge::ColliderType::CIRCLE},
 		{"radius", 50},
-		{"restitution", 0},
+		{"restitution", 1},
 		{"bounce", 1},
-		{"friction", 1}
+		{"friction", 1},
+		{"sensor", false}
 	};
 
 	json entityBody2;
@@ -75,7 +76,8 @@ TEST(Physics, TestBallFallingToGround)
 
 	json transformJson2 = {
 		{"type", sfge::ComponentType::TRANSFORM2D},
-		{"position", {700, 600}},
+		{"position", {700, 500}},
+		{"angle", 0},
 		{"scale", {1.0, 1.0}}
 	};
 	json rectShapeJson = {
@@ -94,109 +96,19 @@ TEST(Physics, TestBallFallingToGround)
 		{"type", sfge::ComponentType::COLLIDER2D},
 		{"collider_type", sfge::ColliderType::BOX},
 		{"size", {100, 100}},
-		{"restitution", 0},
+		{"restitution", 1},
 		{"bounce", 1},
 		{"friction", 1}
 	};
 
-	entityBody1["components"] = {transformJson1, circleShapeJson, rigidBodyJson1, circleColliderJson};
-	entityBody2["components"] = {transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson};
+	entityBody1["components"] = {transformJson1, rectShapeJson, rigidBodyJson1, rectColliderJson };
+	entityBody2["components"] = {transformJson2, rectShapeJson, rigidBodyJson1, rectColliderJson};
 
 	sceneJson["entities"] = {entityBody1, entityBody2};
 	sceneJson["systems"] = json::array({
 		{{"script_path", "scripts/contact_debug_system.py"}},
 		{{"systemClassName", "Debug"}}
 	});
-
-	sceneManager->LoadSceneFromJson(sceneJson);
-	engine.Start();
-}
-
-TEST(Physics, NewtonPendulum)
-{
-	sfge::Engine engine;
-	auto config = std::make_unique<sfge::Configuration>();
-	config->devMode = false;
-	config->gravity = p2Vec2(0, 0);
-	config->maxFramerate = 0;
-	engine.Init(std::move(config));
-
-	auto* sceneManager = engine.GetSceneManager();
-
-	json sceneJson;
-	sceneJson["name"] = "Ball Falling To Ground";
-
-	const auto entitiesNmb = 6;
-	json entities[entitiesNmb];
-
-	entities[0]["name"] = "Ball1";
-
-	json circleShapeJson1 = {
-		{"name", "Circle Shape Component"},
-		{"type", sfge::ComponentType::SHAPE2D},
-		{"shape_type", sfge::ShapeType::CIRCLE},
-		{"radius", 50}
-	};
-	json circleColliderJson1 = {
-		{"name", "Circle Collider"},
-		{"type", sfge::ComponentType::COLLIDER2D},
-		{"collider_type", sfge::ColliderType::CIRCLE},
-		{"radius", 50},
-		{"restitution", 1},
-		{"bounce", 1},
-		{"friction", 1}
-	};
-
-	json circleShapeJson2 = {
-		{"name", "Circle Shape Component"},
-		{"type", sfge::ComponentType::SHAPE2D},
-		{"shape_type", sfge::ShapeType::CIRCLE},
-		{"radius", 75}
-	};
-	json circleColliderJson2 = {
-		{"name", "Circle Collider"},
-		{"type", sfge::ComponentType::COLLIDER2D},
-		{"collider_type", sfge::ColliderType::CIRCLE},
-		{"radius", 75},
-		{"restitution", 1},
-		{"bounce", 1},
-		{"friction", 1}
-	};
-
-	json transformJson1 = {
-		{"type", sfge::ComponentType::TRANSFORM2D},
-		{"position", {250, 300}},
-		{"scale", {1.0, 1.0}}
-	};
-	json rigidBodyJson1 = {
-		{"name", "Rigidbody"},
-		{"type", sfge::ComponentType::BODY2D},
-		{"body_type", p2BodyType::DYNAMIC},
-		{"velocity", {1000, 0}}
-	};
-	json rigidBodyJson2 = {
-		{"name", "Rigidbody"},
-		{"type", sfge::ComponentType::BODY2D},
-		{"body_type", p2BodyType::DYNAMIC},
-	};
-
-	entities[0]["components"] = { transformJson1, circleShapeJson2, rigidBodyJson1, circleColliderJson2 };
-	for (auto i = 1u; i < entitiesNmb; ++i)
-	{
-		entities[i]["name"] = "Ball" + std::to_string(i + 1);
-		json transform = {
-			{"type", sfge::ComponentType::TRANSFORM2D},
-			{"position", {400 + (i - 1) * 100, 300}},
-			{"scale", {1.0, 1.0}}
-		};
-
-		entities[i]["components"] = { transform, circleShapeJson1, rigidBodyJson2, circleColliderJson1 };
-	}
-
-	sceneJson["entities"] = entities;
-	sceneJson["systems"] = json::array({
-		{{"script_path", "scripts/contact_debug_system.py"}},
-		{{"systemClassName", "Debug"}} });
 
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();

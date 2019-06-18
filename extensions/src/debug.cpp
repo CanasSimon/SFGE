@@ -6,6 +6,7 @@
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
 #include "imgui.h"
+#include <corecrt_math_defines.h>
 
 
 namespace sfge::ext
@@ -27,6 +28,7 @@ namespace sfge::ext
 		m_Shape2DManager = m_Graphics2DManager->GetShapeManager();
 		m_InputManager = m_Engine.GetInputManager();
 		m_KeyboardManager = &m_InputManager->GetKeyboardManager();
+		m_MouseManager = &m_InputManager->GetMouseManager();
 
 		m_QuadTree = m_World->GetQuadTree();
 
@@ -56,6 +58,8 @@ namespace sfge::ext
 	{
 		(void)dt;
 
+		//m_Transforms[1]->EulerAngle += 45 * dt;
+
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::A)) m_DrawAabb = !m_DrawAabb;
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::Q)) m_DrawQuadTree = !m_DrawQuadTree;
 		if (m_KeyboardManager->IsKeyDown(sf::Keyboard::Key::F)) {
@@ -63,10 +67,25 @@ namespace sfge::ext
 			m_FrameByFrame ? m_World->timeScale = 0.01 : m_World->timeScale = 1;
 		}
 
-		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Up)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, -.1));
-		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Down)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(0, .1));
-		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Right)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(.1, 0));
-		if (m_KeyboardManager->IsKeyHeld(sf::Keyboard::Key::Left)) m_Bodies[0]->ApplyForceToCenter(p2Vec2(-.1, 0));
+		const auto mousePosition = pixel2meter(m_MouseManager->GetPosition());
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			for (auto* body : m_Bodies)
+			{
+				if (body->GetAabb().DoContain(mousePosition))
+				{
+					m_HeldBody = body;
+					break;
+				}
+			}
+		}
+		else m_HeldBody = nullptr;
+
+		if (m_HeldBody != nullptr)
+		{
+			m_HeldBody->SetPosition(mousePosition);
+			m_HeldBody->SetLinearVelocity(p2Vec2::ZERO);
+		}
 
 		for (auto& body : m_Bodies)
 		{
@@ -100,22 +119,12 @@ namespace sfge::ext
 	void Debug::OnDraw()
 	{
 		rmt_ScopedCPUSample(DebugDraw, 0);
-		ImGui::Begin("Debug");
-		if (ImGui::Button("AABB / OBB")) m_DrawAabb = !m_DrawAabb;
-		if (ImGui::Button("QuadTree")) m_DrawQuadTree = !m_DrawQuadTree;
-		if (ImGui::Button("Frame by Frame")) {
-			m_FrameByFrame = !m_FrameByFrame;
-			m_FrameByFrame ? m_World->timeScale = 0.01 : m_World->timeScale = 1;
-		}
-		ImGui::End();
 
-		for (auto& contact : m_World->GetContactManager().contacts)
+		/*for (auto& contact : m_World->GetContactManager().contacts)
 		{
-			m_Graphics2DManager->DrawLine(meter2pixel(contact->GetColliderA()->position),
-				meter2pixel(contact->GetColliderB()->position), sf::Color::White);
 			m_Graphics2DManager->DrawVector(meter2pixel(contact->normal), Vec2f(400, 400), sf::Color::White);
 			m_Graphics2DManager->DrawVector(meter2pixel(contact->mtv), Vec2f(400,400), sf::Color::Yellow);
-		}
+		}*/
 
 		if (m_DrawQuadTree)
 		{
@@ -129,7 +138,7 @@ namespace sfge::ext
 				DrawAabb(body->GetAabb(), sf::Color::Red);
 				for (auto& collider : body->GetColliders())
 				{
-					DrawAabb(collider.GetAabb(), sf::Color::White);
+					DrawAabb(collider.GetAabb(), sf::Color::Green);
 				}
 			}
 		}

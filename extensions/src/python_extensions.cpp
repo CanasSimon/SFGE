@@ -30,6 +30,7 @@ SOFTWARE.
 #include <extensions/debug.h>
 #include <extensions/body_test.h>
 #include <extensions/vector_test.h>
+#include <extensions/explosion.h>
 
 #include <tools/tools_pch.h>
 
@@ -53,6 +54,10 @@ void ExtendPython(py::module& m)
 
 	py::class_<BodyTest, System> bodyTest(m, "BodyTest");
 	bodyTest
+		.def(py::init<Engine&>());
+
+	py::class_<Explosion, System> explosion(m, "Explosion");
+	explosion
 		.def(py::init<Engine&>());
 	
 

@@ -64,7 +64,6 @@ public:
 	void Init(p2ColliderDef* colliderDef);
 	void RebuildAabb(const p2Vec2& bodyPos, float bodyRot);
 	p2Collider();
-	bool IsSensor() const;
 	void* GetUserData() const;
 	p2Shape* GetShape() const;
 	p2ColliderType GetType() const;
@@ -78,6 +77,8 @@ public:
 	float restitution = 0;
 	float bounce = 0;
 	float friction = 0;
+
+	bool isSensor;
 private:
 	p2Aabb m_Aabb;
 	void* m_UserData = nullptr;

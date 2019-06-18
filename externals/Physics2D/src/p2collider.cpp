@@ -14,6 +14,7 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 	restitution = colliderDef->restitution;
 	bounce = colliderDef->bounce;
 	friction = colliderDef->friction;
+	isSensor = colliderDef->isSensor;
 
 	std::cout << m_Shape->type << "\n";
 
@@ -99,10 +100,6 @@ void p2Collider::RebuildAabb(const p2Vec2& bodyPos, float bodyRot)
 	}
 }
 
-bool p2Collider::IsSensor() const
-{
-	return m_ColliderDefinition.isSensor;
-}
 
 void* p2Collider::GetUserData() const
 {

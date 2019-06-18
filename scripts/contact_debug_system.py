@@ -41,5 +41,3 @@ class ContactDebugSystem(System):
             body2d: Body2d = physics2d_manager.body2d_manager.get_component(entity)
 
             position = transform.position
-            vector_pos = Physics2dManager.meter2pixel(body2d.p2body.get_aabb_extends())
-            graphics2d_manager.draw_vector(vector_pos, position, Color.Green)

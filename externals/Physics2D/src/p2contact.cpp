@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include <p2contact.h>
 #include <iostream>
+#include <corecrt_math_defines.h>
 
 /**
  * \brief Default Constructor
@@ -61,17 +62,18 @@ void p2ContactManager::TestContacts(p2Body& bodyA, p2Body& bodyB)
 
 	if (index == -1)
 	{
-		if (CheckSat(contact))
+		if (p2Aabb::DoOverlapWith(bodyA.GetAabb(), bodyB.GetAabb()) && CheckSat(contact))
 		{
 			contactListener->AddContact(contact);
 			contacts.push_back(contact);
 
-			CorrectPositions(bodyA, bodyB, contact);
+			if (!colliderA.isSensor && !colliderB.isSensor) CorrectPositions(bodyA, bodyB, contact);
+			contact->isAlreadyUpdated = true;
 		}
 	}
 	else if (index != -2)
 	{
-		if (!p2Aabb::DoOverlapWith(bodyA.GetAabb(), bodyB.GetAabb()) || !CheckSat(contact))
+		if (!CheckSat(contact))
 		{
 			contactListener->DeleteContact(contact);
 			contacts.erase(contacts.begin() + index);
@@ -81,7 +83,8 @@ void p2ContactManager::TestContacts(p2Body& bodyA, p2Body& bodyB)
 		{
 			contacts[index] = contact;
 
-			CorrectPositions(bodyA, bodyB, contact);
+			if (!colliderA.isSensor && !colliderB.isSensor) CorrectPositions(bodyA, bodyB, contact);
+			contact->isAlreadyUpdated = true;
 		}
 	}
 }
@@ -123,26 +126,22 @@ void p2ContactManager::CorrectPositions(p2Body& bodyA, p2Body& bodyB, p2Contact*
 		if (bodyB.GetType() == p2BodyType::STATIC) bodyA.Offset(-contact->mtv);
 		else bodyA.Offset(-contact->mtv / 2);
 
-		/*const auto newVelocity = ((velocityB - velocityA) * massB * (1 - colliderB.restitution) + 
-			velocityA * massA + velocityB * massB) / (massA + massB);*/
-
-		const auto newVelocity = p2Vec2(velocityA.x * colliderB.friction, velocityA.y * colliderB.bounce).
+		const auto newVelocityReflection = p2Vec2(velocityA.x * colliderB.friction, velocityA.y * colliderB.bounce).
 			GetReflection(contact->normal);
 
-		bodyA.SetLinearVelocity(newVelocity);
+		bodyA.SetLinearVelocity(newVelocityReflection * (1 - colliderB.restitution) + 
+			velocityB * colliderB.restitution);
 	}
 	if (bodyB.GetType() != p2BodyType::STATIC)
 	{
 		if (bodyA.GetType() == p2BodyType::STATIC) bodyB.Offset(contact->mtv);
 		else bodyB.Offset(contact->mtv / 2);
 
-		/*const auto newVelocity = ((velocityA - velocityB) * massA * (1 - colliderA.restitution) +
-			velocityA * massA + velocityB * massB) / (massA + massB);*/
-
-		const auto newVelocity = p2Vec2(velocityB.x * colliderA.friction, velocityB.y * colliderA.bounce).
+		const auto newVelocityReflection = p2Vec2(velocityB.x * colliderA.friction, velocityB.y * colliderA.bounce).
 			GetReflection(contact->normal);
 
-		bodyB.SetLinearVelocity(newVelocity);
+		bodyB.SetLinearVelocity(newVelocityReflection * (1 - colliderA.restitution) +
+			velocityA * colliderA.restitution);
 	}
 }
 
@@ -263,7 +262,13 @@ bool p2ContactManager::CheckRectSat(p2Contact* contact)
 		if (aMaxProj < bMinProj || bMaxProj < aMinProj) return false;
 	}
 
-	contact->mtv = CheckMinkowskiDifference(aabbA, aabbB);
+	const auto distance = p2Vec2::GetVectorFrom(colliderA->position, colliderB->position);
+	const auto upVector = aabbA.edges[0].GetNormal() + aabbB.edges[0].GetNormal();
+	const auto angle = p2Vec2::AngleBetween(distance, upVector);
+	if (angle < M_PI / 4 || angle > 3 * M_PI / 4) contact->normal = upVector;
+	else contact->normal = upVector.Rotate(90);
+
+	//contact->mtv = CheckMinkowskiDifference(aabbA, aabbB);
 
 	return true;
 }
@@ -301,6 +306,7 @@ bool p2ContactManager::CheckCircleRectSat(p2Contact* contact)
 	}
 
 	const auto aabbA = colliderA->GetAabb();
+	const auto radius = aabbA.GetExtends() / 2;
 	const auto aabbB = colliderB->GetAabb();
 
 	for (auto i = 0u; i < aabbB.vertices.size() / 2; ++i)
@@ -308,39 +314,22 @@ bool p2ContactManager::CheckCircleRectSat(p2Contact* contact)
 		if (aabbA.GetCenter().LineSide(aabbB.vertices[i], aabbB.vertices[i + 1]) == 1 &&
 			aabbA.GetCenter().LineSide(aabbB.vertices[i + 2], aabbB.vertices[(i + 3) % aabbB.vertices.size()]) == 1)
 		{
-			contact->normal = p2Vec2::GetVectorFrom(aabbB.vertices[i], aabbB.vertices[i + 1]).Normalized();
+			std::cout << aabbA.GetCenter().LineSide(aabbB.vertices[i + 1], aabbB.vertices[i + 2]);
+			if (aabbA.GetCenter().LineSide(aabbB.vertices[i + 1], aabbB.vertices[i + 2]) == 0) 
+				contact->normal = -aabbB.edges[i + 1].Normalized();
+			else contact->normal = aabbB.edges[i + 1].Normalized();
 			goto InZone;
 		}
 	}
 	goto NotInZone;
 
 InZone:
-	for (auto i = 0u; i < aabbB.edges.size() / 2; ++i)
-	{
-		const auto aPoint1 = aabbA.GetCenter() - colliderA->GetHalfExtend();
-		const auto aPoint2 = aabbA.GetCenter() + colliderA->GetHalfExtend();
-
-		const auto aMaxProj = p2Vec2::Dot(aabbA.edges[i], aPoint1);
-		const auto aMinProj = p2Vec2::Dot(aabbA.edges[i], aPoint2);
-		auto bMaxProj = -std::numeric_limits<float>::infinity();
-		auto bMinProj = std::numeric_limits<float>::infinity();
-
-		for (auto& vertex : aabbB.vertices)
-		{
-			const auto proj = p2Vec2::Dot(aabbA.edges[i], vertex);
-			if (proj < bMinProj) bMinProj = proj;
-			if (proj > bMaxProj) bMaxProj = proj;
-		}
-
-		if (aMaxProj <= bMinProj || bMaxProj <= aMinProj)
-		{
-			return false;
-		}
-	}
-
-	contact->mtv = CheckMinkowskiDifference(aabbA, aabbB);
-
-	return true;
+	const auto distance = p2Vec2::GetVectorFrom(colliderA->position, colliderB->position);
+	contact->mtv = contact->normal * p2Vec2(
+		colliderA->GetHalfExtend().x + colliderB->GetHalfExtend().x - distance.GetMagnitude(),
+		colliderA->GetHalfExtend().y + colliderB->GetHalfExtend().y - distance.GetMagnitude());
+	return (contact->normal * distance.GetMagnitude()).GetMagnitude() < colliderA->GetHalfExtend().x + colliderB->GetHalfExtend().x && 
+		(contact->normal * distance.GetMagnitude()).GetMagnitude() < colliderA->GetHalfExtend().y + colliderB->GetHalfExtend().y;
 
 NotInZone:
 	auto dist = std::numeric_limits<float>::infinity();
@@ -350,12 +339,12 @@ NotInZone:
 		{
 			dist = vertex.GetDistance(aabbA.GetCenter());
 			const auto vector1 = p2Vec2::GetVectorFrom(aabbA.GetCenter(), vertex);
-			const auto vector2 = vector1.Normalized() * colliderA->GetHalfExtend().x;
+			const auto vector2 = vector1.Normalized() * radius.x;
 			contact->mtv = vector2 - vector1;
 			contact->normal = vector1.Normalized();
 		}
 	}
-	return dist <= colliderA->GetHalfExtend().x;
+	return dist <= radius.x;
 }
 
 p2Vec2 p2ContactManager::CheckMinkowskiDifference(const p2Aabb rect1, const p2Aabb rect2)
