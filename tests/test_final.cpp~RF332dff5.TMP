@@ -101,7 +101,7 @@ TEST(Final, TestAabb)
 		{"type", sfge::ComponentType::COLLIDER2D},
 		{"collider_type", sfge::ColliderType::CIRCLE},
 		{"radius", 50},
-		{"offset", {rand() % 200 - 100, rand() % 200 - 100}},
+		{"offset", {100, 100}},
 		{"sensor", true}
 	};
 
@@ -119,7 +119,7 @@ TEST(Final, TestAabb)
 		{"body_type", p2BodyType::DYNAMIC},
 		{"max_colliders", 2}
 	};
-	entities[0]["components"] = { transformJson1, circleShape, rigidbody, circleColliderShape1, circleColliderShape2 };
+	entities[0]["components"] = { transformJson1, circleShape, rigidbody, circleColliderShape1, circleColliderShape1 };
 	entities[1]["components"] = { transformJson2, rectShape, rigidbody, rectColliderShape1, rectColliderShape2 };
 
 	sceneJson["entities"] = entities;
